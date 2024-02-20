@@ -1,0 +1,7 @@
+# fly.toml app configuration file generated for puzzlehunt-bot on 2024-02-20T18:02:57+11:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'puzzlehunt-bot'
+primary_region = 'syd'
