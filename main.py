@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from src.config import config
 
 TOKEN = ""
 
@@ -28,7 +29,4 @@ async def sync(ctx: commands.context.Context):
         print(e)
 
 
-with open(".token", "r") as t:
-    TOKEN = t.readline().strip()
-
-bot.run(TOKEN)
+bot.run(config["DISCORD_TOKEN"])
