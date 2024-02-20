@@ -55,7 +55,8 @@ async def reload(ctx: commands.context.Context, extension):
 @bot.command()
 async def sync(ctx: commands.context.Context):
     try:
-        synced = await bot.tree.sync()
+        bot.tree.copy_global_to(guild=ctx.guild)
+        synced = await bot.tree.sync(guild=ctx.guild)
         await ctx.send(f"Synced {len(synced)} commands.")
     except Exception as e:
         print(e)
