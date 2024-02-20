@@ -19,5 +19,8 @@ class Answers(commands.Cog):
     @app_commands.command(name="check")
     # remember to add a check so that users can only check answers in their respective
     # team channels
-    async def check_answer(self, puzz_name: str, answer: str):
+    async def check_answer(self, interaction: discord.Interaction, puzz_name: str, answer: str):
         pass
+
+async def setup(bot: commands.Bot):
+    await bot.add_cog(Answers(bot))
