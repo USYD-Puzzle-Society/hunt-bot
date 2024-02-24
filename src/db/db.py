@@ -42,14 +42,14 @@ async def get_team(team_name: str):
                 "SELECT * from public.teams WHERE team_name = %s", (team_name,)
             )
             records = await acur.fetchall()
-            for record in records:
-                print(record)
+            return records
 
 
 async def main():
     await truncate()
     await create_team("test", "boop1", "boop2", "boop3", "boop4")
-    await get_team("test")
+    teams = await get_team("test")
+    return teams
 
 
 if __name__ == "__main__":
