@@ -25,7 +25,6 @@ CREATE TABLE public.teams (
 
 CREATE TABLE public.players (
     discord_id text PRIMARY KEY,
-    player_name text NOT NULL,
     team_name text NOT NULL REFERENCES public.teams ON DELETE CASCADE
 );
 
