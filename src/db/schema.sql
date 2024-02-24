@@ -9,20 +9,27 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+DROP TABLE IF EXISTS public.teams;
+DROP TABLE IF EXISTS public.players;
+DROP TABLE IF EXISTS public.puzzles;
+DROP TABLE IF EXISTS public.submission;
 
-CREATE TABLE IF NOT EXISTS public.teams (
+CREATE TABLE public.teams (
     team_name text PRIMARY KEY,
-    team_channel text NOT NULL,
+    category_channel_id text NOT NULL,
+    voice_channel_id text NOT NULL,
+    text_channel_id text NOT NULL,
+    team_role_id text NOT NULL,
     puzzle_solved integer NOT NULL default 0
 );
 
-CREATE TABLE IF NOT EXISTS public.players (
+CREATE TABLE public.players (
     discord_id text PRIMARY KEY,
     player_name text NOT NULL,
     team_name text NOT NULL REFERENCES public.teams ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS public.puzzles (
+CREATE TABLE public.puzzles (
     puzzle_id text PRIMARY KEY,
     puzzle_name text NOT NULL,
     puzzle_answer text NOT NULL,
@@ -30,7 +37,7 @@ CREATE TABLE IF NOT EXISTS public.puzzles (
     uni text NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS public.submissions (
+CREATE TABLE public.submissions (
     puzzle_id text NOT NULL REFERENCES public.puzzles ON DELETE CASCADE,    
     team_name text NOT NULL REFERENCES public.teams ON DELETE CASCADE,
     submission_time timestamptz NOT NULL,
