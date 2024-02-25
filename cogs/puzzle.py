@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands, User, Member
 
-from src.context.puzzle import find_puzzle
+from src.queries.puzzle import find_puzzle
 
 
 class Puzzle(commands.GroupCog):
