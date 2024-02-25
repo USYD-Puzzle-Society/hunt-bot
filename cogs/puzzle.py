@@ -7,6 +7,7 @@ from discord import app_commands
 from src.queries.puzzle import find_puzzle
 from src.queries.submission import create_submission
 from src.utils.decorators import in_team_channel
+from src.context.puzzle import can_access_puzzle, get_accessible_puzzles
 
 
 class Puzzle(commands.GroupCog):
@@ -19,7 +20,9 @@ class Puzzle(commands.GroupCog):
         self, interaction: discord.Interaction, puzzle_id: str, answer: str
     ):
         puzzle = await find_puzzle(puzzle_id)
-        if not puzzle:
+        if not puzzle or not can_access_puzzle(
+            puzzle, interaction.user.id
+        ):  # TODO: pass team into can_access_puzzle
             return await interaction.response.send_message(
                 "No puzzle with the corresponding id exist!"
             )
@@ -52,11 +55,19 @@ class Puzzle(commands.GroupCog):
     @app_commands.command(name="list", description="List the available puzzles")
     @in_team_channel
     async def list_puzzles(self, interaction: discord.Interaction):
-        # first, queries in the submission table to find how many meta the team has solved
+        puzzles = await get_accessible_puzzles(interaction.user.id)
+        embed = discord.Embed(title="Current Puzzles", color=discord.Color.greyple())
 
-        # from this information, calculate the puzzles the solver have access to
+        puzzle_ids, puzzle_links = zip(
+            *[
+                (puzzle.puzzle_id, f"[{puzzle.puzzle_name}]({puzzle.puzzle_link})")
+                for puzzle in puzzles
+            ]
+        )
 
-        pass
+        embed.add_field(name="ID", value="\n".join(puzzle_ids), inline=True)
+        embed.add_field(name="Puzzles", value="\n".join(puzzle_links), inline=True)
+        await interaction.response.send_message(embed=embed)
 
 
 async def setup(bot: commands.Bot):

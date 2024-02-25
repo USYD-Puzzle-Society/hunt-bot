@@ -7,4 +7,5 @@ class Puzzle:
     puzzle_name: str
     puzzle_answer: str
     puzzle_author: str
+    puzzle_link: str
     uni: str

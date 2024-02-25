@@ -33,6 +33,7 @@ CREATE TABLE public.puzzles (
     puzzle_name text NOT NULL,
     puzzle_answer text NOT NULL,
     puzzle_author text NOT NULL,
+    puzzle_link text NOT NULL,
     uni text NOT NULL
 );
 
