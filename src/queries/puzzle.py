@@ -13,4 +13,4 @@ async def find_puzzle(puzzle_id: str):
             await acur.execute(
                 "SELECT * FROM public.puzzles WHERE puzzle_id = %s", (puzzle_id,)
             )
-            return await acur.fetchall()
+            return await acur.fetchone()
