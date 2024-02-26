@@ -3,6 +3,8 @@ from discord.ext import commands
 from discord import app_commands
 from discord import Guild
 
+import src.queries.team as query
+
 
 class Team(commands.GroupCog):
     def __init__(self, bot):
