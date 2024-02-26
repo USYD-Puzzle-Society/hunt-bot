@@ -158,3 +158,6 @@ bin/**
 lib64/**
 pyvenv.cfg
 lib64
+
+# docker volumne
+pg_data
