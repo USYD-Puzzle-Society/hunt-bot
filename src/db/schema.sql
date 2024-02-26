@@ -9,10 +9,10 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-DROP TABLE IF EXISTS public.teams;
-DROP TABLE IF EXISTS public.players;
-DROP TABLE IF EXISTS public.puzzles;
-DROP TABLE IF EXISTS public.submission;
+DROP TABLE IF EXISTS public.teams CASCADE;
+DROP TABLE IF EXISTS public.players CASCADE;
+DROP TABLE IF EXISTS public.puzzles CASCADE;
+DROP TABLE IF EXISTS public.submissions CASCADE;
 
 CREATE TABLE public.teams (
     team_name text PRIMARY KEY,
