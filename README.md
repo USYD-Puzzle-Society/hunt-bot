@@ -1,4 +1,6 @@
-# hunt bot
+# PuzzleHunt bot!
+
+A simple discord bot that handles team and puzzle logistic for an online puzzle hunt!
 
 ## Local database setup
 
