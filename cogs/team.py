@@ -75,6 +75,7 @@ class Team(commands.GroupCog):
         role.delete()
 
         # also delete the team
+        team_query.remove_team(team_name)
 
 
 async def setup(bot: commands.Bot):
