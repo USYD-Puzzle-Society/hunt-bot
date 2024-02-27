@@ -38,7 +38,9 @@ async def get_team_members(team_name: str):
         SELECT * FROM public.players AS t
         JOIN public.teams AS p
         WHERE t.team_name = p.team_name
-        """
+        AND t.team_name = %s
+        """,
+        (team_name,),
     )
 
     players = await acur.fetchall()
