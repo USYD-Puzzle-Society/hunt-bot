@@ -4,6 +4,7 @@ from datetime import datetime
 
 from src.config import config
 from src.models.team import Team
+from src.models.player import Player
 
 DATABASE_URL = config["DATABASE_URL"]
 
@@ -26,6 +27,26 @@ async def get_team(team_name: str):
     aconn.close()
 
     return result
+
+
+async def get_team_members(team_name: str):
+    aconn = await psycopg.AsyncConnection.connect(DATABASE_URL)
+    acur = aconn.cursor(row_factory=class_row(Player))
+
+    await acur.execute(
+        """
+        SELECT * FROM public.players AS t
+        JOIN public.teams AS p
+        WHERE t.team_name = p.team_name
+        """
+    )
+
+    players = await acur.fetchall()
+
+    acur.close()
+    aconn.close()
+
+    return players
 
 
 async def create_team(
