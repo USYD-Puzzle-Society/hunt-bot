@@ -3,7 +3,8 @@ from discord.ext import commands
 from discord import app_commands
 from discord import Guild
 
-import src.queries.team as query
+import src.queries.team as team_query
+import src.queries.player as player_query
 
 
 class Team(commands.GroupCog):
@@ -37,21 +38,29 @@ class Team(commands.GroupCog):
         )
 
     @app_commands.command(name="leave")
-    async def leave_team(self, interaction: discord.Interaction, team_name: str):
+    async def leave_team(self, interaction: discord.Interaction):
         # remove team role from user
         user = interaction.user
         guild = interaction.guild
 
-        team = await query.get_team(team_name)
+        # get the team name from the user
+        discord_id = user.id
+        player = await player_query.get_player(discord_id)
+        team_name = player.team_name
+
+        team = await team_query.get_team(team_name)
         team_role_id = int(team.team_role_id)
         role = guild.get_role(team_role_id)
 
         await user.remove_roles(role)
 
+        # delete player
+        await player_query.remove_player(discord_id)
+
         # check amount of people still in team
         # if none, delete team and respective channels
         # also delete the role
-        team_members = await query.get_team_members(team_name)
+        team_members = await team_query.get_team_members(team_name)
         if team_members:
             return
 
@@ -64,6 +73,8 @@ class Team(commands.GroupCog):
         voice_channel.delete()
         category_channel.delete()
         role.delete()
+
+        # also delete the team
 
 
 async def setup(bot: commands.Bot):
