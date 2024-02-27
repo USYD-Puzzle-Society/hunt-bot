@@ -8,6 +8,26 @@ from src.models.team import Team
 DATABASE_URL = config["DATABASE_URL"]
 
 
+async def get_team(team_name: str):
+    aconn = await psycopg.AsyncConnection.connect(DATABASE_URL)
+    acur = aconn.cursor(row_factory=class_row(Team))
+
+    await acur.execute(
+        """
+        SELECT * FROM public.teams as t
+        WHERE t.team_name = %s
+        """,
+        (team_name,),
+    )
+
+    # there should only be one result
+    result = await acur.fetchone()
+    acur.close()
+    aconn.close()
+
+    return result
+
+
 async def create_team(
     team_name: str,
     category_channel_id: str,
@@ -37,26 +57,6 @@ async def create_team(
     aconn.commit()
     acur.close()
     aconn.close()
-
-
-async def get_team(team_name: str):
-    aconn = await psycopg.AsyncConnection.connect(DATABASE_URL)
-    acur = aconn.cursor(row_factory=class_row(Team))
-
-    await acur.execute(
-        """
-        SELECT * FROM public.teams as t
-        WHERE t.team_name = %s
-        """,
-        (team_name,),
-    )
-
-    # there should only be one result
-    result = await acur.fetchone()
-    acur.close()
-    aconn.close()
-
-    return result
 
 
 async def remove_team(team_name: str):
