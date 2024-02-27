@@ -39,9 +39,31 @@ class Team(commands.GroupCog):
     @app_commands.command(name="leave")
     async def leave_team(self, interaction: discord.Interaction, team_name: str):
         # remove team role from user
-        # if there are no more people in the team, delete the role and channels
+        user = interaction.user
+        guild = interaction.guild
 
-        pass
+        team = await query.get_team(team_name)
+        team_role_id = int(team.team_role_id)
+        role = guild.get_role(team_role_id)
+
+        await user.remove_roles(role)
+
+        # check amount of people still in team
+        # if none, delete team and respective channels
+        # also delete the role
+        team_members = await query.get_team_members(team_name)
+        if team_members:
+            return
+
+        # if here, then there are no members remaining in the teams
+        text_channel = guild.get_channel(team.text_channel_id)
+        voice_channel = guild.get_channel(team.voice_channel_id)
+        category_channel = guild.get_channel(team.category_channel_id)
+
+        text_channel.delete()
+        voice_channel.delete()
+        category_channel.delete()
+        role.delete()
 
 
 async def setup(bot: commands.Bot):
