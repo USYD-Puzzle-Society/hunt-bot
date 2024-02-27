@@ -16,27 +16,33 @@ async def create_team(
     team_role_id: str,
 ):
     async with await psycopg.AsyncConnection.connect(DATABASE_URL) as aconn:
-        async with aconn.cursor() as acur:
-            await acur.execute(
-                """
-                INSERT INTO public.teams
-                (team_name, category_channel_id, voice_channel_id, text_channel_id, team_role_id)
-                AS
-                VALUES(%s, %s, %s, %s, %s)
-                """,
-                (
-                    team_name,
-                    category_channel_id,
-                    voice_channel_id,
-                    text_channel_id,
-                    team_role_id,
-                ),
-            )
+        aconn = await psycopg.AsyncConnection.connect(DATABASE_URL)
+        acur = aconn.cursor()
+
+        await acur.execute(
+            """
+            INSERT INTO public.teams
+            (team_name, category_channel_id, voice_channel_id, text_channel_id, team_role_id)
+            AS
+            VALUES(%s, %s, %s, %s, %s)
+            """,
+            (
+                team_name,
+                category_channel_id,
+                voice_channel_id,
+                text_channel_id,
+                team_role_id,
+            ),
+        )
+
+        aconn.commit()
+        acur.close()
+        aconn.close()
 
 
 async def get_team(team_name: str):
     aconn = await psycopg.AsyncConnection.connect(DATABASE_URL)
-    acur = await aconn.cursor(row_factor=class_row(Team))
+    acur = aconn.cursor(row_factory=class_row(Team))
 
     await acur.execute(
         """
@@ -46,7 +52,9 @@ async def get_team(team_name: str):
         (team_name,),
     )
 
+    # there should only be one result
     result = await acur.fetchone()
+    acur.close()
     aconn.close()
 
     return result
