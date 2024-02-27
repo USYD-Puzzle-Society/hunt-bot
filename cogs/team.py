@@ -17,19 +17,33 @@ class Team(commands.GroupCog):
         user = interaction.user
         guild = interaction.guild
 
-        # include code to check that the name is not already taken
-        # will involve a call to the respective sql function
+        # check team name is not already taken
+        if team_query.get_team(team_name):
+            interaction.response.send_message(
+                f'Team "{team_name}" is already taken. Please choose a different team name.'
+            )
 
         # if name not taken, add check for profanity and such
-
-        team_role = await Guild.create_role(guild, name=team_name)
+        team_role = await guild.create_role(name=team_name)
         overwrites = {
             guild.default_role: discord.PermissionOverwrite(read_messages=False),
             team_role: discord.PermissionOverwrite(read_messages=True),
         }
-        category = await Guild.create_category(guild, team_name, overwrites=overwrites)
-        await category.create_text_channel(name=team_name)
-        await category.create_voice_channel(name=team_name)
+        category = await guild.create_category(team_name, overwrites=overwrites)
+        text_channel = await category.create_text_channel(name=team_name)
+        voice_channel = await category.create_voice_channel(name=team_name)
+
+        # create team in database
+        team_query.create_team(
+            team_name,
+            str(category.id),
+            str(voice_channel.id),
+            str(text_channel.id),
+            str(team_role.id),
+        )
+
+        # add player to database
+        player_query.add_player(user.id, team_name)
 
         # give role to user
         await user.add_roles(team_role)
