@@ -60,6 +60,10 @@ class Team(commands.GroupCog):
         # get the team name from the user
         discord_id = user.id
         player = await player_query.get_player(str(discord_id))
+
+        if not player:
+            return interaction.response.send_message("You are not part of a team.")
+
         team_name = player.team_name
 
         team = await team_query.get_team(team_name)
