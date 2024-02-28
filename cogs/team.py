@@ -6,7 +6,7 @@ from discord import Guild
 import src.queries.team as team_query
 import src.queries.player as player_query
 
-
+BOT_ID = 1209630493801320558
 class Team(commands.GroupCog):
     def __init__(self, bot):
         self.bot = bot
@@ -28,6 +28,9 @@ class Team(commands.GroupCog):
         overwrites = {
             guild.default_role: discord.PermissionOverwrite(read_messages=False),
             team_role: discord.PermissionOverwrite(read_messages=True),
+            
+            # this line allows the bot to see the private channels it creates
+            guild.get_member(BOT_ID): discord.PermissionOverwrite(read_messages=True)
         }
         category = await guild.create_category(team_name, overwrites=overwrites)
         text_channel = await category.create_text_channel(name=team_name)
@@ -62,7 +65,8 @@ class Team(commands.GroupCog):
         player = await player_query.get_player(str(discord_id))
 
         if not player:
-            return interaction.response.send_message("You are not part of a team.")
+            await interaction.response.send_message("You are not part of a team.")
+            return
 
         team_name = player.team_name
 
@@ -103,7 +107,7 @@ class Team(commands.GroupCog):
         guild = interaction.guild
 
         # check user is already in a team
-        player = await player_query.get_player(user.id)
+        player = await player_query.get_player(str(user.id))
         if not player:
             interaction.response.send_message(
                 "You must be in a team to use this command."
@@ -112,7 +116,7 @@ class Team(commands.GroupCog):
         team_name = player.team_name
 
         # check invited user is not already in a team
-        if await player_query.get_player(invited_user.id):
+        if await player_query.get_player(str(invited_user.id)):
             interaction.response.send_message(
                 "The user you're trying to invite is already in a team."
             )
