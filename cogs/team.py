@@ -100,6 +100,10 @@ class Team(commands.GroupCog):
         # also delete the team
         await team_query.remove_team(team_name)
 
+        await interaction.response.send_message(
+            "You have left the team.", ephemeral=True
+        )
+
     @app_commands.command(name="invite")
     async def invite(
         self, interaction: discord.Interaction, invited_user: discord.Member
