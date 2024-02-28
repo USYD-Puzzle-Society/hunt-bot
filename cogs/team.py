@@ -7,6 +7,8 @@ import src.queries.team as team_query
 import src.queries.player as player_query
 
 BOT_ID = 1209630493801320558
+
+
 class Team(commands.GroupCog):
     def __init__(self, bot):
         self.bot = bot
@@ -28,9 +30,8 @@ class Team(commands.GroupCog):
         overwrites = {
             guild.default_role: discord.PermissionOverwrite(read_messages=False),
             team_role: discord.PermissionOverwrite(read_messages=True),
-            
             # this line allows the bot to see the private channels it creates
-            guild.get_member(BOT_ID): discord.PermissionOverwrite(read_messages=True)
+            guild.get_member(BOT_ID): discord.PermissionOverwrite(read_messages=True),
         }
         category = await guild.create_category(team_name, overwrites=overwrites)
         text_channel = await category.create_text_channel(name=team_name)
@@ -120,6 +121,7 @@ class Team(commands.GroupCog):
             interaction.response.send_message(
                 "The user you're trying to invite is already in a team."
             )
+            return
 
         # otherwise send an invite
         embed = discord.Embed(
@@ -136,14 +138,28 @@ class Team(commands.GroupCog):
 
         # add invited user to the team and database
         async def accept_callback(interaction: discord.Interaction):
+            new_player = interaction.user
             team = await team_query.get_team(team_name)
-            invited_user.add_roles(guild.get_role(int(team.team_role_id)))
 
-            # test line. delete later
-            print(interaction.user())
+            # add new user to team
+            await invited_user.add_roles(guild.get_role(int(team.team_role_id)))
+            await player_query.add_player(str(new_player.id), team_name)
+
+            # edit message so that user can't click again
+            accept_embed = discord.Embed(
+                colour=discord.Color.green,
+                title=f"{team_name} Invitation",
+                description=f"Invitation accepted! You've joined {team_name}",
+            )
+            await interaction.response.edit_message(embed=accept_embed)
 
         async def reject_callback(interaction: discord.Interaction):
-            await user.send(content="Your team invitation has been declined.")
+            reject_embed = discord.Embed(
+                color=discord.Color.red,
+                title=f"{team_name} Invitation",
+                description=f"Invitation rejected.",
+            )
+            await interaction.response.edit_message(embed=reject_embed)
 
         accept_btn.callback = accept_callback
         reject_btn.callback = reject_callback
