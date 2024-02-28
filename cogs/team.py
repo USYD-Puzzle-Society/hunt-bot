@@ -152,19 +152,19 @@ class Team(commands.GroupCog):
 
             # edit message so that user can't click again
             accept_embed = discord.Embed(
-                colour=discord.Color.green,
+                colour=discord.Color.green(),
                 title=f"{team_name} Invitation",
                 description=f"Invitation accepted! You've joined {team_name}. [Click here](<#{team.text_channel_id}>) to go there.",
             )
-            await interaction.response.edit_message(embed=accept_embed)
+            await interaction.response.edit_message(embed=accept_embed, view=None)
 
         async def reject_callback(interaction: discord.Interaction):
             reject_embed = discord.Embed(
-                color=discord.Color.red,
+                color=discord.Color.red(),
                 title=f"{team_name} Invitation",
                 description=f"Invitation rejected.",
             )
-            await interaction.response.edit_message(embed=reject_embed)
+            await interaction.response.edit_message(embed=reject_embed, view=None)
 
         accept_btn.callback = accept_callback
         reject_btn.callback = reject_callback
