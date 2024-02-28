@@ -22,7 +22,8 @@ class Team(commands.GroupCog):
         # check team name is not already taken
         if await team_query.get_team(team_name):
             return await interaction.response.send_message(
-                f'Team "{team_name}" is already taken. Please choose a different team name.'
+                f'Team "{team_name}" is already taken. Please choose a different team name.',
+                ephemeral=True,
             )
 
         # if name not taken, add check for profanity and such
@@ -52,7 +53,7 @@ class Team(commands.GroupCog):
         # give role to user
         await user.add_roles(team_role)
         await interaction.response.send_message(
-            f'Team "{team_name}" created successfully!'
+            f'Team "{team_name}" created successfully!', ephemeral=True
         )
 
     @app_commands.command(name="leave")
@@ -66,7 +67,9 @@ class Team(commands.GroupCog):
         player = await player_query.get_player(str(discord_id))
 
         if not player:
-            await interaction.response.send_message("You are not part of a team.")
+            await interaction.response.send_message(
+                "You are not part of a team.", ephemeral=True
+            )
             return
 
         team_name = player.team_name
@@ -119,7 +122,7 @@ class Team(commands.GroupCog):
         player = await player_query.get_player(str(user.id))
         if not player:
             interaction.response.send_message(
-                "You must be in a team to use this command."
+                "You must be in a team to use this command.", ephemeral=True
             )
 
         team_name = player.team_name
@@ -127,7 +130,7 @@ class Team(commands.GroupCog):
         # check invited user is not already in a team
         if await player_query.get_player(str(invited_user.id)):
             await interaction.response.send_message(
-                "The user you're trying to invite is already in a team."
+                "The user you're trying to invite is already in a team.", ephemeral=True
             )
             return
 
