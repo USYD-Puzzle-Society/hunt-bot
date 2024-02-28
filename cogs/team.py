@@ -19,7 +19,7 @@ class Team(commands.GroupCog):
 
         # check team name is not already taken
         if await team_query.get_team(team_name):
-            await interaction.response.send_message(
+            return await interaction.response.send_message(
                 f'Team "{team_name}" is already taken. Please choose a different team name.'
             )
 
@@ -43,7 +43,7 @@ class Team(commands.GroupCog):
         )
 
         # add player to database
-        await player_query.add_player(user.id, team_name)
+        await player_query.add_player(str(user.id), team_name)
 
         # give role to user
         await user.add_roles(team_role)
@@ -59,7 +59,7 @@ class Team(commands.GroupCog):
 
         # get the team name from the user
         discord_id = user.id
-        player = await player_query.get_player(discord_id)
+        player = await player_query.get_player(str(discord_id))
         team_name = player.team_name
 
         team = await team_query.get_team(team_name)
@@ -69,7 +69,7 @@ class Team(commands.GroupCog):
         await user.remove_roles(role)
 
         # delete player
-        await player_query.remove_player(discord_id)
+        await player_query.remove_player(str(discord_id))
 
         # check amount of people still in team
         # if none, delete team and respective channels
@@ -79,14 +79,14 @@ class Team(commands.GroupCog):
             return
 
         # if here, then there are no members remaining in the teams
-        text_channel = guild.get_channel(team.text_channel_id)
-        voice_channel = guild.get_channel(team.voice_channel_id)
-        category_channel = guild.get_channel(team.category_channel_id)
+        text_channel = guild.get_channel(int(team.text_channel_id))
+        voice_channel = guild.get_channel(int(team.voice_channel_id))
+        category_channel = guild.get_channel(int(team.category_channel_id))
 
-        text_channel.delete()
-        voice_channel.delete()
-        category_channel.delete()
-        role.delete()
+        await text_channel.delete()
+        await voice_channel.delete()
+        await category_channel.delete()
+        await role.delete()
 
         # also delete the team
         await team_query.remove_team(team_name)

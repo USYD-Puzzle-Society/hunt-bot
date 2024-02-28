@@ -15,7 +15,7 @@ async def get_team(team_name: str):
 
     await acur.execute(
         """
-        SELECT * FROM public.teams as t
+        SELECT * FROM public.teams AS t
         WHERE t.team_name = %s
         """,
         (team_name,),
@@ -23,8 +23,8 @@ async def get_team(team_name: str):
 
     # there should only be one result
     result = await acur.fetchone()
-    acur.close()
-    aconn.close()
+    await acur.close()
+    await aconn.close()
 
     return result
 
@@ -35,18 +35,18 @@ async def get_team_members(team_name: str):
 
     await acur.execute(
         """
-        SELECT * FROM public.players AS t
-        JOIN public.teams AS p
-        WHERE t.team_name = p.team_name
-        AND t.team_name = %s
+        SELECT p.discord_id, p.team_name FROM public.players AS p
+        JOIN public.teams AS t
+        ON t.team_name = p.team_name
+        WHERE t.team_name = %s
         """,
         (team_name,),
     )
 
     players = await acur.fetchall()
 
-    acur.close()
-    aconn.close()
+    await acur.close()
+    await aconn.close()
 
     return players
 
@@ -65,8 +65,7 @@ async def create_team(
         """
         INSERT INTO public.teams
         (team_name, category_channel_id, voice_channel_id, text_channel_id, team_role_id)
-        AS
-        VALUES(%s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s)
         """,
         (
             team_name,
@@ -77,9 +76,9 @@ async def create_team(
         ),
     )
 
-    aconn.commit()
-    acur.close()
-    aconn.close()
+    await aconn.commit()
+    await acur.close()
+    await aconn.close()
 
 
 async def remove_team(team_name: str):
@@ -93,12 +92,12 @@ async def remove_team(team_name: str):
     # team exists otherwise
     await acur.execute(
         """
-        DELETE FROM public.teams 
+        DELETE FROM public.teams AS t
         WHERE t.team_name = %s
         """,
         (team_name,),
     )
 
-    aconn.commit()
-    acur.close()
-    aconn.close()
+    await aconn.commit()
+    await acur.close()
+    await aconn.close()

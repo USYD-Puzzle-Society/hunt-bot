@@ -21,8 +21,8 @@ async def get_player(discord_id: str):
 
     player = await acur.fetchone()
 
-    aconn.close()
-    acur.close()
+    await aconn.close()
+    await acur.close()
 
     return player
 
@@ -40,10 +40,10 @@ async def add_player(discord_id: str, team_name: str):
         (discord_id, team_name),
     )
 
-    aconn.commit()
+    await aconn.commit()
 
-    acur.close()
-    aconn.close()
+    await acur.close()
+    await aconn.close()
 
 
 async def remove_player(discord_id: str):
@@ -58,7 +58,7 @@ async def remove_player(discord_id: str):
         (discord_id,),
     )
 
-    aconn.commit()
+    await aconn.commit()
 
-    acur.close()
-    aconn.close()
+    await acur.close()
+    await aconn.close()
