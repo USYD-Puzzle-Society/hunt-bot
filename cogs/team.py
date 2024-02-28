@@ -19,6 +19,13 @@ class Team(commands.GroupCog):
         user = interaction.user
         guild = interaction.guild
 
+        if await player_query.get_player(str(user.id)):
+            await interaction.response.send_message(
+                "You are already in a team. Please leave the team before creating a new one.",
+                ephemeral=True,
+            )
+            return
+
         # check team name is not already taken
         if await team_query.get_team(team_name):
             return await interaction.response.send_message(
@@ -121,9 +128,10 @@ class Team(commands.GroupCog):
         # check user is already in a team
         player = await player_query.get_player(str(user.id))
         if not player:
-            interaction.response.send_message(
+            await interaction.response.send_message(
                 "You must be in a team to use this command.", ephemeral=True
             )
+            return
 
         team_name = player.team_name
 
