@@ -7,6 +7,7 @@ import src.queries.team as team_query
 import src.queries.player as player_query
 
 BOT_ID = 1209630493801320558
+MAX_TEAM_SIZE = 5
 
 
 class Team(commands.GroupCog):
@@ -141,6 +142,12 @@ class Team(commands.GroupCog):
                 "The user you're trying to invite is already in a team.", ephemeral=True
             )
             return
+
+        # check that team is not full
+        if len(await team_query.get_team_members()) == MAX_TEAM_SIZE:
+            await interaction.response.send_message(
+                "Your team is full.", ephemeral=True
+            )
 
         # otherwise send an invite
         embed = discord.Embed(
