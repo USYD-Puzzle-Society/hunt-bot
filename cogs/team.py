@@ -136,6 +136,11 @@ class Team(commands.GroupCog):
         view.add_item(accept_btn)
         view.add_item(reject_btn)
 
+        """
+        Completely optional but we could make it so players can add
+        custom accept/reject messages.
+        """
+
         # add invited user to the team and database
         async def accept_callback(interaction: discord.Interaction):
             new_player = interaction.user
@@ -149,7 +154,7 @@ class Team(commands.GroupCog):
             accept_embed = discord.Embed(
                 colour=discord.Color.green,
                 title=f"{team_name} Invitation",
-                description=f"Invitation accepted! You've joined {team_name}",
+                description=f"Invitation accepted! You've joined {team_name}. [Click here](<#{team.text_channel_id}>) to go there.",
             )
             await interaction.response.edit_message(embed=accept_embed)
 
