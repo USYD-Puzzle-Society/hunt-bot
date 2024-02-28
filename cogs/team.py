@@ -18,8 +18,8 @@ class Team(commands.GroupCog):
         guild = interaction.guild
 
         # check team name is not already taken
-        if team_query.get_team(team_name):
-            interaction.response.send_message(
+        if await team_query.get_team(team_name):
+            await interaction.response.send_message(
                 f'Team "{team_name}" is already taken. Please choose a different team name.'
             )
 
@@ -34,7 +34,7 @@ class Team(commands.GroupCog):
         voice_channel = await category.create_voice_channel(name=team_name)
 
         # create team in database
-        team_query.create_team(
+        await team_query.create_team(
             team_name,
             str(category.id),
             str(voice_channel.id),
@@ -43,7 +43,7 @@ class Team(commands.GroupCog):
         )
 
         # add player to database
-        player_query.add_player(user.id, team_name)
+        await player_query.add_player(user.id, team_name)
 
         # give role to user
         await user.add_roles(team_role)
@@ -89,7 +89,7 @@ class Team(commands.GroupCog):
         role.delete()
 
         # also delete the team
-        team_query.remove_team(team_name)
+        await team_query.remove_team(team_name)
 
     @app_commands.command(name="invite")
     async def invite(
@@ -108,7 +108,7 @@ class Team(commands.GroupCog):
         team_name = player.team_name
 
         # check invited user is not already in a team
-        if player_query.get_player(invited_user.id):
+        if await player_query.get_player(invited_user.id):
             interaction.response.send_message(
                 "The user you're trying to invite is already in a team."
             )
