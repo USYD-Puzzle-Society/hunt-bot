@@ -122,7 +122,7 @@ class Team(commands.GroupCog):
 
         # check invited user is not already in a team
         if await player_query.get_player(str(invited_user.id)):
-            interaction.response.send_message(
+            await interaction.response.send_message(
                 "The user you're trying to invite is already in a team."
             )
             return
@@ -158,7 +158,7 @@ class Team(commands.GroupCog):
             accept_embed = discord.Embed(
                 colour=discord.Color.green(),
                 title=f"{team_name} Invitation",
-                description=f"Invitation accepted! You've joined {team_name}. [Click here](<#{team.text_channel_id}>) to go there.",
+                description=f"Invitation accepted! You've joined {team_name}. Join your teammates at <#{team.text_channel_id}>.",
             )
             await interaction.response.edit_message(embed=accept_embed, view=None)
 
