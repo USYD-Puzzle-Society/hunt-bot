@@ -85,7 +85,15 @@ class Team(commands.GroupCog):
         # also delete the role
         team_members = await team_query.get_team_members(team_name)
         if team_members:
+            await interaction.response.send_message(
+                "You have left the team.", ephemeral=True
+            )
             return
+
+        await interaction.response.send_message(
+            "You have left the team. Since there are no members left in the team, the channels will be deleted.",
+            ephemeral=True,
+        )
 
         # if here, then there are no members remaining in the teams
         text_channel = guild.get_channel(int(team.text_channel_id))
@@ -99,10 +107,6 @@ class Team(commands.GroupCog):
 
         # also delete the team
         await team_query.remove_team(team_name)
-
-        await interaction.response.send_message(
-            "You have left the team.", ephemeral=True
-        )
 
     @app_commands.command(name="invite")
     async def invite(
