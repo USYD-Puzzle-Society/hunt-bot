@@ -173,6 +173,16 @@ class Team(commands.GroupCog):
             new_player = interaction.user
             team = await team_query.get_team(team_name)
 
+            # check team still exists
+            if not team:
+                cancel_embed = discord.Embed(
+                    colour=discord.Color.orange(),
+                    title=f"{team_name} Does Not Exist",
+                    description=f"Sorry, looks like that team has been deleted :(",
+                )
+                await interaction.response.edit_message(embed=cancel_embed, view=None)
+                return
+
             # add new user to team
             await invited_user.add_roles(guild.get_role(int(team.team_role_id)))
             await player_query.add_player(str(new_player.id), team_name)
