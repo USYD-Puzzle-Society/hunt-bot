@@ -183,6 +183,17 @@ class Team(commands.GroupCog):
                 await interaction.response.edit_message(embed=cancel_embed, view=None)
                 return
 
+            # check team is not full
+            team_members = await team_query.get_team_members(team_name)
+            if team_members == MAX_TEAM_SIZE:
+                full_embed = discord.Embed(
+                    colour=discord.Color.blue(),
+                    title=f"{team_name} Is Full",
+                    description=f"You can no longer join the team :(",
+                )
+                await interaction.response.edit_message(embed=full_embed, view=None)
+                return
+
             # add new user to team
             await invited_user.add_roles(guild.get_role(int(team.team_role_id)))
             await player_query.add_player(str(new_player.id), team_name)
