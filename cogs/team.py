@@ -148,6 +148,7 @@ class Team(commands.GroupCog):
             await interaction.response.send_message(
                 "Your team is full.", ephemeral=True
             )
+            return
 
         # otherwise send an invite
         embed = discord.Embed(
