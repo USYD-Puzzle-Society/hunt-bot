@@ -144,7 +144,7 @@ class Team(commands.GroupCog):
             return
 
         # check that team is not full
-        if len(await team_query.get_team_members()) == MAX_TEAM_SIZE:
+        if len(await team_query.get_team_members(team_name)) == MAX_TEAM_SIZE:
             await interaction.response.send_message(
                 "Your team is full.", ephemeral=True
             )
@@ -201,16 +201,15 @@ class Team(commands.GroupCog):
             # edit message so that user can't click again
             accept_embed = discord.Embed(
                 colour=discord.Color.green(),
-                title=f"{team_name} Invitation",
-                description=f"Invitation accepted! You've joined {team_name}. Join your teammates at <#{team.text_channel_id}>.",
+                title=f"{team_name} Invitation Accepted",
+                description=f"You are now part of {team_name}! Join your teammates at <#{team.text_channel_id}>.",
             )
             await interaction.response.edit_message(embed=accept_embed, view=None)
 
         async def reject_callback(interaction: discord.Interaction):
             reject_embed = discord.Embed(
                 color=discord.Color.red(),
-                title=f"{team_name} Invitation",
-                description=f"Invitation rejected.",
+                title=f"{team_name} Invitation Rejected",
             )
             await interaction.response.edit_message(embed=reject_embed, view=None)
 
