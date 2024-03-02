@@ -6,7 +6,7 @@ from discord import Guild
 import src.queries.team as team_query
 import src.queries.player as player_query
 
-BOT_ID = 1209630493801320558
+BOT_ID = 1208986388226121849
 MAX_TEAM_SIZE = 5
 
 
