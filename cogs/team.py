@@ -20,8 +20,10 @@ class Team(commands.GroupCog):
         user = interaction.user
         guild = interaction.guild
 
+        await interaction.response.defer(ephemeral=True)
+
         if await player_query.get_player(str(user.id)):
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 "You are already in a team. Please leave the team before creating a new one.",
                 ephemeral=True,
             )
@@ -29,7 +31,7 @@ class Team(commands.GroupCog):
 
         # check team name is not already taken
         if await team_query.get_team(team_name):
-            return await interaction.response.send_message(
+            return await interaction.followup.send(
                 f'Team "{team_name}" is already taken. Please choose a different team name.',
                 ephemeral=True,
             )
@@ -60,8 +62,9 @@ class Team(commands.GroupCog):
 
         # give role to user
         await user.add_roles(team_role)
-        await interaction.response.send_message(
-            f'Team "{team_name}" created successfully!', ephemeral=True
+
+        await interaction.followup.send(
+            content=f'Team "{team_name}" created successfully!', ephemeral=True
         )
 
     @app_commands.command(name="leave")
@@ -70,12 +73,14 @@ class Team(commands.GroupCog):
         user = interaction.user
         guild = interaction.guild
 
+        await interaction.response.defer(ephemeral=True)
+
         # get the team name from the user
         discord_id = user.id
         player = await player_query.get_player(str(discord_id))
 
         if not player:
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 "You are not part of a team.", ephemeral=True
             )
             return
@@ -96,12 +101,10 @@ class Team(commands.GroupCog):
         # also delete the role
         team_members = await team_query.get_team_members(team_name)
         if team_members:
-            await interaction.response.send_message(
-                "You have left the team.", ephemeral=True
-            )
+            await interaction.followup.send("You have left the team.", ephemeral=True)
             return
 
-        await interaction.response.send_message(
+        await interaction.followup.send(
             "You have left the team. Since there are no members left in the team, the channels will be deleted.",
             ephemeral=True,
         )
@@ -126,10 +129,12 @@ class Team(commands.GroupCog):
         user = interaction.user
         guild = interaction.guild
 
+        await interaction.response.defer(ephemeral=True)
+
         # check user is already in a team
         player = await player_query.get_player(str(user.id))
         if not player:
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 "You must be in a team to use this command.", ephemeral=True
             )
             return
@@ -138,16 +143,14 @@ class Team(commands.GroupCog):
 
         # check invited user is not already in a team
         if await player_query.get_player(str(invited_user.id)):
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 "The user you're trying to invite is already in a team.", ephemeral=True
             )
             return
 
         # check that team is not full
         if len(await team_query.get_team_members(team_name)) == MAX_TEAM_SIZE:
-            await interaction.response.send_message(
-                "Your team is full.", ephemeral=True
-            )
+            await interaction.followup.send("Your team is full.", ephemeral=True)
             return
 
         # otherwise send an invite
@@ -173,6 +176,8 @@ class Team(commands.GroupCog):
             new_player = interaction.user
             team = await team_query.get_team(team_name)
 
+            await interaction.response.defer()
+
             # check team still exists
             if not team:
                 cancel_embed = discord.Embed(
@@ -180,7 +185,9 @@ class Team(commands.GroupCog):
                     title=f"{team_name} Does Not Exist",
                     description=f"Sorry, looks like that team has been deleted :(",
                 )
-                await interaction.response.edit_message(embed=cancel_embed, view=None)
+                await interaction.followup.edit_message(
+                    message_id=interaction.message.id, embed=cancel_embed, view=None
+                )
                 return
 
             # check team is not full
@@ -191,7 +198,9 @@ class Team(commands.GroupCog):
                     title=f"{team_name} Is Full",
                     description=f"You can no longer join the team :(",
                 )
-                await interaction.response.edit_message(embed=full_embed, view=None)
+                await interaction.followup.edit_message(
+                    message_id=interaction.message.id, embed=full_embed, view=None
+                )
                 return
 
             # add new user to team
@@ -204,20 +213,27 @@ class Team(commands.GroupCog):
                 title=f"{team_name} Invitation Accepted",
                 description=f"You are now part of {team_name}! Join your teammates at <#{team.text_channel_id}>.",
             )
-            await interaction.response.edit_message(embed=accept_embed, view=None)
+
+            await interaction.followup.edit_message(
+                message_id=interaction.message.id, embed=accept_embed, view=None
+            )
 
         async def reject_callback(interaction: discord.Interaction):
+            await interaction.response.defer()
+
             reject_embed = discord.Embed(
                 color=discord.Color.red(),
                 title=f"{team_name} Invitation Rejected",
             )
-            await interaction.response.edit_message(embed=reject_embed, view=None)
+            await interaction.followup.edit_message(
+                message_id=interaction.message.id, embed=reject_embed, view=None
+            )
 
         accept_btn.callback = accept_callback
         reject_btn.callback = reject_callback
 
         await invited_user.send(embed=embed, view=view)
-        await interaction.response.send_message(
+        await interaction.followup.send(
             f"{invited_user} has been invited to your team.", ephemeral=True
         )
 
