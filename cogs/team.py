@@ -7,7 +7,7 @@ import src.queries.team as team_query
 import src.queries.player as player_query
 
 BOT_ID = 1208986388226121849
-MAX_TEAM_SIZE = 5
+MAX_TEAM_SIZE = 6
 
 
 class Team(commands.GroupCog):
