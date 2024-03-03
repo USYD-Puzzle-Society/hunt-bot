@@ -32,7 +32,7 @@ def can_access_puzzle_context(puzzle: Puzzle, completed_puzzles: List[Puzzle]) -
 
     if (
         puzzle.puzzle_id == "USYD-M"
-        and len([puzzles for puzzles in completed_puzzles if puzzle.uni == "USYD"])
+        and len([puzzle for puzzle in completed_puzzles if puzzle.uni == "USYD"])
         >= NUMBER_OF_FEEDERS["USYD"]
     ):
         return True
@@ -46,7 +46,7 @@ def can_access_puzzle_context(puzzle: Puzzle, completed_puzzles: List[Puzzle]) -
 
     if (
         puzzle.puzzle_id == "UNSW-M"
-        and len([puzzles for puzzles in completed_puzzles if puzzle.uni == "UNSW"])
+        and len([puzzle for puzzle in completed_puzzles if puzzle.uni == "UNSW"])
         >= NUMBER_OF_FEEDERS["UNSW"]
     ):
         return True
