@@ -7,10 +7,56 @@ NUMBER_OF_FEEDERS = {"UTS": 4, "UNSW": 4, "USYD": 6}
 
 
 # the meat of the context. given a puzzle and a list of completed puzzle, determine if the puzzle is accessible yet
-# current logic: solver must have solved all feeders to get the meta
+# current logic:
+# all puzzles in a round are unlocked if the previous meta is completed (UTS is unlocked by default)
+# order is UTS -> USYD -> UNSW
+# solver must have solved all feeders to get the meta
 # all meta solved to get the metameta
 def can_access_puzzle_context(puzzle: Puzzle, completed_puzzles: List[Puzzle]) -> bool:
-    return True
+    if puzzle.uni == "UTS" and puzzle.puzzle_id != "UTS-M":
+        return True
+
+    if (
+        puzzle.puzzle_id == "UTS-M"
+        and len([puzzle for puzzle in completed_puzzles if puzzle.uni == "UTS"])
+        >= NUMBER_OF_FEEDERS["UTS"]
+    ):
+        return True
+
+    if (
+        puzzle.uni == "USYD"
+        and puzzle.puzzle_id != "USYD-M"
+        and any([puzzle.puzzle_id == "UTS-M" for puzzle in completed_puzzles])
+    ):
+        return True
+
+    if (
+        puzzle.puzzle_id == "USYD-M"
+        and len([puzzles for puzzles in completed_puzzles if puzzle.uni == "USYD"])
+        >= NUMBER_OF_FEEDERS["USYD"]
+    ):
+        return True
+
+    if (
+        puzzle.uni == "UNSW"
+        and puzzle.puzzle_id != "UNSW-M"
+        and any([puzzle.puzzle_id == "USYD-M" for puzzle in completed_puzzles])
+    ):
+        return True
+
+    if (
+        puzzle.puzzle_id == "UNSW-M"
+        and len([puzzles for puzzles in completed_puzzles if puzzle.uni == "UNSW"])
+        >= NUMBER_OF_FEEDERS["UNSW"]
+    ):
+        return True
+
+    if puzzle.puzzle_id == "METAMETA" and any(
+        [puzzle.puzzle_id == "UNSW-M" for puzzle in completed_puzzles]
+    ):
+        return True
+
+    raise Exception("Invalid puzzle ID found!")
 
 
 async def can_access_puzzle(puzzle: Puzzle, discord_id: int) -> bool:
