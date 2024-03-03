@@ -31,7 +31,7 @@ class Puzzle(commands.GroupCog):
         player = await get_player(str(interaction.user.id))
         if not puzzle or not await can_access_puzzle(puzzle, player.team_name):
             return await interaction.followup.send(
-                "No puzzle with the corresponding id exist!"
+                "No puzzle with the corresponding ID exist!"
             )
         submissions = await find_submissions_by_player_id_and_puzzle_id(
             player.discord_id, puzzle_id
