@@ -6,7 +6,10 @@ from discord.ext import commands
 from discord import app_commands
 
 from src.queries.puzzle import get_puzzle, create_puzzle
-from src.queries.submission import create_submission
+from src.queries.submission import (
+    create_submission,
+    find_submissions_by_player_id_and_puzzle_id,
+)
 from src.queries.player import get_player
 from src.utils.decorators import in_team_channel
 from src.context.puzzle import can_access_puzzle, get_accessible_puzzles
@@ -27,6 +30,14 @@ class Puzzle(commands.GroupCog):
                 "No puzzle with the corresponding id exist!"
             )
         player = await get_player(str(interaction.user.id))
+        submissions = await find_submissions_by_player_id_and_puzzle_id(
+            player.discord_id, puzzle_id
+        )
+
+        if any([submission.submission_is_correct for submission in submissions]):
+            return await interaction.response.send_message(
+                "You have already completed this puzzle!"
+            )
 
         submission_is_correct = puzzle.puzzle_answer == answer
 
