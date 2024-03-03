@@ -59,17 +59,13 @@ def can_access_puzzle_context(puzzle: Puzzle, completed_puzzles: List[Puzzle]) -
     raise Exception("Invalid puzzle ID found!")
 
 
-async def can_access_puzzle(puzzle: Puzzle, discord_id: int) -> bool:
-    player = await get_player(str(discord_id))
-    return can_access_puzzle_context(
-        puzzle, await get_completed_puzzles(player.team_name)
-    )
+async def can_access_puzzle(puzzle: Puzzle, team_name: str) -> bool:
+    return can_access_puzzle_context(puzzle, await get_completed_puzzles(team_name))
 
 
-async def get_accessible_puzzles(discord_id: int) -> List[Puzzle]:
+async def get_accessible_puzzles(team_name: str) -> List[Puzzle]:
     puzzles = await get_puzzles()
-    player = await get_player(str(discord_id))
-    completed_puzzles = await get_completed_puzzles(player.team_name)
+    completed_puzzles = await get_completed_puzzles(team_name)
     return [
         puzzle
         for puzzle in puzzles

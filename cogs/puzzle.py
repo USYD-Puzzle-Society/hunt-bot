@@ -14,6 +14,8 @@ from src.queries.player import get_player
 from src.utils.decorators import in_team_channel
 from src.context.puzzle import can_access_puzzle, get_accessible_puzzles
 
+ADMIN_CHANNEL_ID = 1213355205614374973
+
 
 class Puzzle(commands.GroupCog):
     def __init__(self, bot):
@@ -25,11 +27,11 @@ class Puzzle(commands.GroupCog):
         self, interaction: discord.Interaction, puzzle_id: str, answer: str
     ):
         puzzle = await get_puzzle(puzzle_id)
-        if not puzzle or not await can_access_puzzle(puzzle, interaction.user.id):
+        player = await get_player(str(interaction.user.id))
+        if not puzzle or not await can_access_puzzle(puzzle, player.team_name):
             return await interaction.response.send_message(
                 "No puzzle with the corresponding id exist!"
             )
-        player = await get_player(str(interaction.user.id))
         submissions = await find_submissions_by_player_id_and_puzzle_id(
             player.discord_id, puzzle_id
         )
@@ -59,7 +61,8 @@ class Puzzle(commands.GroupCog):
     @app_commands.command(name="list", description="List the available puzzles")
     @in_team_channel
     async def list_puzzles(self, interaction: discord.Interaction):
-        puzzles = await get_accessible_puzzles(interaction.user.id)
+        player = await get_player(str(interaction.user.id))
+        puzzles = await get_accessible_puzzles(player.team_name)
         embed = discord.Embed(title="Current Puzzles", color=discord.Color.greyple())
 
         puzzle_ids, puzzle_links = zip(
@@ -72,6 +75,17 @@ class Puzzle(commands.GroupCog):
         embed.add_field(name="ID", value="\n".join(puzzle_ids), inline=True)
         embed.add_field(name="Puzzles", value="\n".join(puzzle_links), inline=True)
         await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name="hint", description="Request a hint for the puzzle!")
+    @in_team_channel
+    async def hint(self, interaction: discord.Interaction):
+        team = await get_player(interaction.user.id)
+        await interaction.client.get_channel(ADMIN_CHANNEL_ID).send(
+            f"Hint request submitted from team {team.team_name}!"
+        )
+        await interaction.response.send_message(
+            "Your hint request has been submitted! Hang on tight - a hint giver will be with you shortly."
+        )
 
     @app_commands.command(
         name="create", description="Create a puzzle (must have admin role)."
