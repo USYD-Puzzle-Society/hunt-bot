@@ -56,8 +56,7 @@ def can_access_puzzle_context(puzzle: Puzzle, completed_puzzles: List[Puzzle]) -
     ):
         return True
 
-    # should not get to here if puzzle id are in the correct format
-    raise Exception("Invalid puzzle ID found!")
+    return False
 
 
 async def can_access_puzzle(puzzle: Puzzle, team_name: str) -> bool:
