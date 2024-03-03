@@ -79,7 +79,7 @@ class Puzzle(commands.GroupCog):
     @app_commands.command(name="hint", description="Request a hint for the puzzle!")
     @in_team_channel
     async def hint(self, interaction: discord.Interaction):
-        team = await get_player(interaction.user.id)
+        team = await get_player(str(interaction.user.id))
         await interaction.client.get_channel(ADMIN_CHANNEL_ID).send(
             f"Hint request submitted from team {team.team_name}!"
         )
