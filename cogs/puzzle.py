@@ -81,7 +81,7 @@ class Puzzle(commands.GroupCog):
     async def hint(self, interaction: discord.Interaction):
         team = await get_player(str(interaction.user.id))
         await interaction.client.get_channel(ADMIN_CHANNEL_ID).send(
-            f"Hint request submitted from team {team.team_name}!"
+            f"Hint request submitted from team {team.team_name}! {interaction.channel.mention}"
         )
         await interaction.response.send_message(
             "Your hint request has been submitted! Hang on tight - a hint giver will be with you shortly."
