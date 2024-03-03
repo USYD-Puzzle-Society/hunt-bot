@@ -1,11 +1,13 @@
 from datetime import datetime
+from typing import Literal
 from zoneinfo import ZoneInfo
 import discord
 from discord.ext import commands
 from discord import app_commands
 
-from src.queries.puzzle import find_puzzle, create_puzzle
+from src.queries.puzzle import get_puzzle, create_puzzle
 from src.queries.submission import create_submission
+from src.queries.player import get_player
 from src.utils.decorators import in_team_channel
 from src.context.puzzle import can_access_puzzle, get_accessible_puzzles
 
@@ -19,17 +21,18 @@ class Puzzle(commands.GroupCog):
     async def submit_answer(
         self, interaction: discord.Interaction, puzzle_id: str, answer: str
     ):
-        puzzle = await find_puzzle(puzzle_id)
-        if not puzzle or not can_access_puzzle(puzzle, interaction.user.id):
+        puzzle = await get_puzzle(puzzle_id)
+        if not puzzle or not await can_access_puzzle(puzzle, interaction.user.id):
             return await interaction.response.send_message(
                 "No puzzle with the corresponding id exist!"
             )
-        # TODO: retrieve team name
-        team_name = "any"
-        submission_is_correct = puzzle.puzzle_answer != answer
+        player = await get_player(str(interaction.user.id))
+
+        submission_is_correct = puzzle.puzzle_answer == answer
+
         await create_submission(
             puzzle_id,
-            team_name,
+            player.team_name,
             datetime.now(tz=ZoneInfo("Australia/Sydney")),
             answer,
             submission_is_correct,
@@ -60,18 +63,26 @@ class Puzzle(commands.GroupCog):
         await interaction.response.send_message(embed=embed)
 
     @app_commands.command(
-        name="create", description="Create a puzzle (must have admin role)"
+        name="create", description="Create a puzzle (must have admin role)."
     )
-    async def list_puzzles(
+    async def create_puzzles(
         self,
         interaction: discord.Interaction,
+        puzzle_id: str,
         puzzle_name: str,
+        puzzle_answer: str,
+        puzzle_author: str,
+        puzzle_link: str,
+        uni: Literal["UTS", "UNSW", "USYD", "METAMETA"],
     ):
-        # surely there's a better way to do this
         if "Executives" not in [role.name for role in interaction.user.roles]:
             return await interaction.response.send_message(
                 f"You don't have permission to do this!"
             )
+
+        await create_puzzle(
+            puzzle_id, puzzle_name, puzzle_answer, puzzle_author, puzzle_link, uni
+        )
 
         await interaction.response.send_message(f"Puzzle {puzzle_name} created!")
 

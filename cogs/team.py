@@ -11,7 +11,7 @@ MAX_TEAM_SIZE = 6
 
 
 class Team(commands.GroupCog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @app_commands.command(name="create")
@@ -42,7 +42,9 @@ class Team(commands.GroupCog):
             guild.default_role: discord.PermissionOverwrite(read_messages=False),
             team_role: discord.PermissionOverwrite(read_messages=True),
             # this line allows the bot to see the private channels it creates
-            guild.get_member(BOT_ID): discord.PermissionOverwrite(read_messages=True),
+            guild.get_member(self.bot.application_id): discord.PermissionOverwrite(
+                read_messages=True
+            ),
         }
         category = await guild.create_category(team_name, overwrites=overwrites)
         text_channel = await category.create_text_channel(name=team_name)
