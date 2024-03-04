@@ -42,7 +42,9 @@ class Admin(commands.GroupCog):
 
         await interaction.followup.send(f"Puzzle {puzzle_name} created!")
 
-    @app_commands.commands(name="delete_puzzle")
+    @app_commands.commands(
+        name="delete_puzzle", description="Delete an existing puzzle."
+    )
     @commands.has_role(EXEC_ID)
     async def delete_puzzle(self, interaction: discord.Interaction, puzzle_id: str):
         await interaction.response.defer()
@@ -55,7 +57,10 @@ class Admin(commands.GroupCog):
 
         await interaction.followup.send(f"Puzzle {puzzle_id} deleted.")
 
-    @app_commands.commands(name="set_hint_channel")
+    @app_commands.commands(
+        name="set_hint_channel",
+        description="Set the current channel to be the hint channel.",
+    )
     @commands.has_role(EXEC_ID)
     async def set_hint_channel(self, interaction: discord.Interaction):
         channel = interaction.channel
