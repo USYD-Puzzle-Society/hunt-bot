@@ -64,13 +64,27 @@ async def sync(ctx: commands.context.Context):
 
 @bot.command()
 async def clear(ctx: commands.context.Context):
-    bot.tree.clear_commands()
+    bot.tree.clear_commands(guild=ctx.guild)
 
     try:
         await bot.tree.sync()
         await ctx.send("Commands cleared.")
     except Exception as e:
         print(e)
+
+
+@bot.command()
+@commands.has_role(EXEC_ID)
+async def sethintchannel(ctx: commands.context.Context):
+    channel = ctx.channel
+
+    # set new channel id in environment variable
+    os.environ["ADMIN_CHANNEL_ID"] = str(channel.id)
+
+    # change the config variable
+    config["ADMIN_CHANNEL_ID"] = channel.id
+
+    await ctx.send(f"Hints will now be redirected to <#{channel.id}>")
 
 
 bot.run(config["DISCORD_TOKEN"])
