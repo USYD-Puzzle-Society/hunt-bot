@@ -65,3 +65,24 @@ async def create_puzzle(
                     uni,
                 ),
             )
+
+
+async def delete_puzzle(puzzle_id: str):
+    aconn = await psycopg.AsyncConnection.connect(DATABASE_URL)
+    acur = aconn.cursor()
+
+    # check existence of puzzle
+    if not await get_puzzle(puzzle_id):
+        return False
+
+    await acur.execute(
+        """
+        DELETE FROM public.puzzles as p
+        WHERE p.puzzle_id = %s
+        """,
+        (puzzle_id,),
+    )
+
+    await aconn.commit()
+    await acur.close()
+    await aconn.close()
