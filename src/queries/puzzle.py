@@ -45,6 +45,25 @@ async def get_puzzles_by_uni(uni: str) -> List[Puzzle]:
     return puzzles
 
 
+async def get_all_puzzles() -> List[Puzzle]:
+    aconn = await psycopg.AsyncConnection.connect(DATABASE_URL)
+    acur = aconn.cursor(row_factory=class_row(Puzzle))
+
+    await acur.execute(
+        """
+        SELECT * FROM public.puzzles as p
+        ORDER BY p.puzzle_id ASC
+        """
+    )
+
+    puzzles = await acur.fetchall()
+
+    await acur.close()
+    await aconn.close()
+
+    return puzzles
+
+
 async def get_completed_puzzles(team_name: str):
     async with await psycopg.AsyncConnection.connect(DATABASE_URL) as aconn:
         async with aconn.cursor(row_factory=class_row(Puzzle)) as acur:
