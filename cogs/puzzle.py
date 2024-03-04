@@ -90,28 +90,6 @@ class Puzzle(commands.GroupCog):
             "Your hint request has been submitted! Hang on tight - a hint giver will be with you shortly."
         )
 
-    @app_commands.command(
-        name="create", description="Create a puzzle (must have admin role)."
-    )
-    @app_commands.checks.has_role(EXEC_ID)
-    async def create_puzzles(
-        self,
-        interaction: discord.Interaction,
-        puzzle_id: str,
-        puzzle_name: str,
-        puzzle_answer: str,
-        puzzle_author: str,
-        puzzle_link: str,
-        uni: Literal["UTS", "UNSW", "USYD", "METAMETA"],
-    ):
-        await interaction.response.defer()
-
-        await create_puzzle(
-            puzzle_id, puzzle_name, puzzle_answer, puzzle_author, puzzle_link, uni
-        )
-
-        await interaction.followup.send(f"Puzzle {puzzle_name} created!")
-
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Puzzle(bot))
