@@ -52,6 +52,9 @@ class Admin(commands.GroupCog):
         except for the meta which will be
         [UNI]-M
         e.g USYD-M
+
+        AND except for the metameta which will just be
+        METAMETA
         """
 
         """
@@ -64,9 +67,18 @@ class Admin(commands.GroupCog):
         that means a puzzle with that id was removed and we now fill that hole.
         """
 
+        # check for metameta
         puzzle_id = ""
+        if uni == "METAMETA":
+            puzzle_id = uni
+            metameta = await get_puzzle(uni)
+
+            if metameta:
+                await interaction.followup.send(f"{uni} already exists!")
+                return
+
         # if the puzzle is the meta, then skip these steps
-        if meta:
+        elif meta:
             puzzle_id = f"{uni}-M"
 
             # check if meta already exists
@@ -135,4 +147,5 @@ class Admin(commands.GroupCog):
 
 
 async def setup(bot: commands.Bot):
+
     await bot.add_cog(Admin(bot))
