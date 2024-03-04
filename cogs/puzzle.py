@@ -15,6 +15,7 @@ from src.utils.decorators import in_team_channel
 from src.context.puzzle import can_access_puzzle, get_accessible_puzzles
 
 ADMIN_CHANNEL_ID = 1213355205614374973
+EXEC_ID = "Executives"
 
 
 class Puzzle(commands.GroupCog):
@@ -91,6 +92,7 @@ class Puzzle(commands.GroupCog):
     @app_commands.command(
         name="create", description="Create a puzzle (must have admin role)."
     )
+    @app_commands.checks.has_role(EXEC_ID)
     async def create_puzzles(
         self,
         interaction: discord.Interaction,
@@ -102,10 +104,6 @@ class Puzzle(commands.GroupCog):
         uni: Literal["UTS", "UNSW", "USYD", "METAMETA"],
     ):
         await interaction.response.defer()
-        if "Executives" not in [role.name for role in interaction.user.roles]:
-            return await interaction.followup.send(
-                f"You don't have permission to do this!"
-            )
 
         await create_puzzle(
             puzzle_id, puzzle_name, puzzle_answer, puzzle_author, puzzle_link, uni
