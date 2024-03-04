@@ -1,3 +1,5 @@
+from src.config import config
+
 from datetime import datetime
 from typing import Literal
 from zoneinfo import ZoneInfo
@@ -14,7 +16,6 @@ from src.queries.player import get_player
 from src.utils.decorators import in_team_channel
 from src.context.puzzle import can_access_puzzle, get_accessible_puzzles
 
-ADMIN_CHANNEL_ID = 1213355205614374973
 EXEC_ID = "Executives"
 
 
@@ -82,7 +83,7 @@ class Puzzle(commands.GroupCog):
     async def hint(self, interaction: discord.Interaction):
         await interaction.response.defer()
         team = await get_player(str(interaction.user.id))
-        await interaction.client.get_channel(ADMIN_CHANNEL_ID).send(
+        await interaction.client.get_channel(config["ADMIN_CHANNEL_ID"]).send(
             f"Hint request submitted from team {team.team_name}! {interaction.channel.mention}"
         )
         await interaction.followup.send(
