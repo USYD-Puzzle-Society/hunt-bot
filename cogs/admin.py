@@ -42,29 +42,6 @@ class Admin(commands.GroupCog):
     ):
         await interaction.response.defer()
 
-        """
-        puzzle_id will be made to fit the form
-        [UNI]-[ID_NUM]
-        e.g USYD-09
-        UTS-02
-        UNSW-03
-
-        except for the meta which will be
-        [UNI]-M
-        e.g USYD-M
-
-        AND except for the metameta which will just be
-        METAMETA
-        
-        Get all puzzles from the given uni (puzzles are given in ascending order)
-        start at 1 and count up through each puzzle. if the number matches the
-        puzzle id, then that id number is not missing and we keep going.
-        if we finish going through all the puzzles with none missing then
-        id_num will be equal to the next number in the sequence.
-        if we see a puzzle whose id doesn't match the current id_num, then
-        that means a puzzle with that id was removed and we now fill that hole.
-        """
-
         # check for metameta
         puzzle_id = ""
         if uni == "METAMETA":
