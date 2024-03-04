@@ -102,7 +102,9 @@ class Admin(commands.GroupCog):
             puzzle_id, puzzle_name, puzzle_answer, puzzle_author, puzzle_link, uni
         )
 
-        await interaction.followup.send(f"Puzzle {puzzle_name} created!")
+        await interaction.followup.send(
+            f"Puzzle {puzzle_name} created! The ID for this puzzle is {puzzle_id}"
+        )
 
     @app_commands.command(
         name="delete_puzzle", description="Delete an existing puzzle."
