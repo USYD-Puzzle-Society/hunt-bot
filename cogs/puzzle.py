@@ -96,15 +96,14 @@ class Puzzle(commands.GroupCog):
         puzzles = await get_accessible_puzzles(player.team_name)
         embed = discord.Embed(title="Current Puzzles", color=discord.Color.greyple())
 
-        puzzle_ids, puzzle_links = zip(
-            *[
-                (puzzle.puzzle_id, f"[{puzzle.puzzle_name}]({puzzle.puzzle_link})")
-                for puzzle in puzzles
-            ]
-        )
+        puzzle_ids = []
+        puzzle_name_links = []
+        for puzzle in puzzles:
+            puzzle_ids.append(puzzle.puzzle_id)
+            puzzle_name_links.append(f"[{puzzle.puzzle_name}]({puzzle.puzzle_link})")
 
         embed.add_field(name="ID", value="\n".join(puzzle_ids), inline=True)
-        embed.add_field(name="Puzzles", value="\n".join(puzzle_links), inline=True)
+        embed.add_field(name="Puzzles", value="\n".join(puzzle_name_links), inline=True)
         await interaction.followup.send(embed=embed)
 
     @app_commands.command(name="hint", description="Request a hint for the puzzle!")
