@@ -17,8 +17,9 @@ class Help(commands.GroupCog):
         user_roles = [role.name for role in user.roles]
 
         admin_commands = [
-            "`/admin create_puzzle [PUZZLE_ID] [PUZZLE_NAME] [PUZZLE_ANSWER] [PUZZLE_AUTHOR] [PUZZLE_LINK] [UNI]` - Creates a new puzzle with given arguments.",
+            "`/admin create_puzzle [PUZZLE_NAME] [PUZZLE_ANSWER] [PUZZLE_LINK] [UNI] [META] [PUZZLE_AUTHOR]` - Creates a new puzzle with given arguments.",
             "`/admin delete_puzzle [PUZZLE_ID]` - Deletes the puzzle with the given ID.",
+            "`/admin list_puzzles` - Lists all created puzzles along with their answers"
             "`/admin set_hint_channel` - Sets the current channel to be the new channel for receiving hint requests.",
         ]
 
