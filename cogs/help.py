@@ -9,7 +9,7 @@ class Help(commands.GroupCog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(name="help", description="Get a list of bot commands")
+    @app_commands.command(name="commands", description="Get a list of bot commands")
     async def help_command(self, interaction: discord.Interaction):
         await interaction.response.defer(ephemeral=True)
 
