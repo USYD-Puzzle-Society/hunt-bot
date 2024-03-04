@@ -107,3 +107,5 @@ async def delete_puzzle(puzzle_id: str):
     await aconn.commit()
     await acur.close()
     await aconn.close()
+
+    return True
