@@ -55,9 +55,7 @@ class Admin(commands.GroupCog):
 
         AND except for the metameta which will just be
         METAMETA
-        """
-
-        """
+        
         Get all puzzles from the given uni (puzzles are given in ascending order)
         start at 1 and count up through each puzzle. if the number matches the
         puzzle id, then that id number is not missing and we keep going.
