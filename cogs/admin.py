@@ -125,6 +125,36 @@ class Admin(commands.GroupCog):
 
         await interaction.followup.send(f"Puzzle {puzzle_id} deleted.")
 
+    @app_commands.command(name="list_puzzles", description="List all created puzzles.")
+    @commands.has_role(EXEC_ID)
+    async def list_puzzles(self, interaction: discord.Interaction):
+        uts_puzzles = await get_puzzles_by_uni("UTS")
+        unsw_puzzles = await get_puzzles_by_uni("UNSW")
+        usyd_puzzles = await get_puzzles_by_uni("USYD")
+
+        all_puzzles = [uts_puzzles, unsw_puzzles, usyd_puzzles]
+
+        all_puzzle_ids = []
+        all_puzzle_name_links = []
+        all_puzzle_answers = []
+        for uni_puzzles in all_puzzles:
+            for puzzle in uni_puzzles:
+                all_puzzle_ids.append(puzzle.puzzle_id)
+                all_puzzle_name_links.append(
+                    f"[{puzzle.puzzle_name}]({puzzle.puzzle_link})"
+                )
+                all_puzzle_answers.append(f"||{puzzle.puzzle_answer}||")
+
+        puzzles_embed = discord.Embed(
+            colour=discord.Color.random(),
+            title="List of Puzzles",
+            description="Puzzles sorted by uni.",
+        )
+
+        puzzles_embed.add_field(name="IDs", value="\n".join(all_puzzle_ids))
+        puzzles_embed.add_field(name="Puzzles", value="\n".join(all_puzzle_name_links))
+        puzzles_embed.add_field(name="Answers", value="\n".join(all_puzzle_answers))
+
     @app_commands.command(
         name="set_hint_channel",
         description="Set the current channel to be the hint channel.",
