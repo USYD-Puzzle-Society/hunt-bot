@@ -17,7 +17,7 @@ class Admin(commands.GroupCog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.commands(name="create_puzzle", description="Create a new puzzle")
+    @app_commands.command(name="create_puzzle", description="Create a new puzzle")
     @commands.has_role(EXEC_ID)
     async def create_puzzle(
         self,
@@ -42,7 +42,7 @@ class Admin(commands.GroupCog):
 
         await interaction.followup.send(f"Puzzle {puzzle_name} created!")
 
-    @app_commands.commands(
+    @app_commands.command(
         name="delete_puzzle", description="Delete an existing puzzle."
     )
     @commands.has_role(EXEC_ID)
@@ -57,7 +57,7 @@ class Admin(commands.GroupCog):
 
         await interaction.followup.send(f"Puzzle {puzzle_id} deleted.")
 
-    @app_commands.commands(
+    @app_commands.command(
         name="set_hint_channel",
         description="Set the current channel to be the hint channel.",
     )
