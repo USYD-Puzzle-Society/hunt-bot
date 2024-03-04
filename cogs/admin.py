@@ -74,11 +74,6 @@ class Admin(commands.GroupCog):
 
             puzzle_id = self.get_id(id_num, uni)
 
-        # puzzle_exists = await get_puzzle(puzzle_id)
-        # if puzzle_exists:
-        #     await interaction.followup.send(f"Puzzle {puzzle_id} already exists!")
-        #     return
-
         await create_puzzle(
             puzzle_id, puzzle_name, puzzle_answer, puzzle_author, puzzle_link, uni
         )
@@ -152,5 +147,4 @@ class Admin(commands.GroupCog):
 
 
 async def setup(bot: commands.Bot):
-
     await bot.add_cog(Admin(bot))
