@@ -62,14 +62,25 @@ class Puzzle(commands.GroupCog):
             return await interaction.followup.send("The submitted answer is incorrect!")
 
         # check if they have solved all the metas
-        completed_puzzles = await get_completed_puzzles(player.team_name)
-        completed_ids = [puzz.puzzle_name for puzz in completed_puzzles]
-        if (
-            "UNSW-M" in completed_ids
-            and "USYD-M" in completed_ids
-            and "UTS-M" in completed_ids
-            and "METAMETA" in completed_ids
-        ):
+        if puzzle_id == "UTS-M":
+            await interaction.followup.send(
+                "The submitted answer is... CORRECT! You've completed all the UTS puzzles and can now see the USYD puzzles."
+            )
+            return
+
+        elif puzzle_id == "USYD-M":
+            await interaction.followup.send(
+                "The submitted answer is... CORRECT! You've completed all the USYD puzzles and can now see the UNSW puzzles."
+            )
+            return
+
+        elif puzzle_id == "UNSW-M":
+            await interaction.followup.send(
+                "The submitted answer is... CORRECT! You've completed all the metas and can now access the METAMETA!"
+            )
+            return
+
+        elif puzzle_id == "METAMETA":
             team = await get_team(player.team_name)
             await interaction.client.get_channel(config["ADMIN_CHANNEL_ID"]).send(
                 f"Team <#{team.text_channel_id}> has finished all the puzzles!"
@@ -81,10 +92,10 @@ class Puzzle(commands.GroupCog):
 
             for team_member in team_members:
                 discord_member = guild.get_member(int(team_member.discord_id))
-                discord_member.add_roles(guild.get_role(config["VICTOR_ROLE_ID"]))
+                await discord_member.add_roles(guild.get_role(config["VICTOR_ROLE_ID"]))
 
             await interaction.followup.send(
-                f"Congratulations! You've finished all the puzzles. Feel free to head over to the <#{config['VICTOR_TEXT_CHANNEL_ID']} in the Victory Lounge.>"
+                f"Congratulations! You've finished all the puzzles. Feel free to head over to the <#{config['VICTOR_TEXT_CHANNEL_ID']}> in the Victory Lounge."
             )
             return
 
