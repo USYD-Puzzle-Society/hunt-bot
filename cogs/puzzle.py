@@ -1,3 +1,5 @@
+from src.config import config
+
 from datetime import datetime
 from typing import Literal
 from zoneinfo import ZoneInfo
@@ -14,7 +16,7 @@ from src.queries.player import get_player
 from src.utils.decorators import in_team_channel
 from src.context.puzzle import can_access_puzzle, get_accessible_puzzles
 
-ADMIN_CHANNEL_ID = 1213355205614374973
+EXEC_ID = "Executives"
 
 
 class Puzzle(commands.GroupCog):
@@ -81,37 +83,12 @@ class Puzzle(commands.GroupCog):
     async def hint(self, interaction: discord.Interaction):
         await interaction.response.defer()
         team = await get_player(str(interaction.user.id))
-        await interaction.client.get_channel(ADMIN_CHANNEL_ID).send(
+        await interaction.client.get_channel(config["ADMIN_CHANNEL_ID"]).send(
             f"Hint request submitted from team {team.team_name}! {interaction.channel.mention}"
         )
         await interaction.followup.send(
             "Your hint request has been submitted! Hang on tight - a hint giver will be with you shortly."
         )
-
-    @app_commands.command(
-        name="create", description="Create a puzzle (must have admin role)."
-    )
-    async def create_puzzles(
-        self,
-        interaction: discord.Interaction,
-        puzzle_id: str,
-        puzzle_name: str,
-        puzzle_answer: str,
-        puzzle_author: str,
-        puzzle_link: str,
-        uni: Literal["UTS", "UNSW", "USYD", "METAMETA"],
-    ):
-        await interaction.response.defer()
-        if "Executives" not in [role.name for role in interaction.user.roles]:
-            return await interaction.followup.send(
-                f"You don't have permission to do this!"
-            )
-
-        await create_puzzle(
-            puzzle_id, puzzle_name, puzzle_answer, puzzle_author, puzzle_link, uni
-        )
-
-        await interaction.followup.send(f"Puzzle {puzzle_name} created!")
 
 
 async def setup(bot: commands.Bot):

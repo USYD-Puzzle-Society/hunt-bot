@@ -62,4 +62,15 @@ async def sync(ctx: commands.context.Context):
         print(e)
 
 
+@bot.command()
+async def clear(ctx: commands.context.Context):
+    bot.tree.clear_commands(guild=ctx.guild)
+
+    try:
+        await bot.tree.sync()
+        await ctx.send("Commands cleared.")
+    except Exception as e:
+        print(e)
+
+
 bot.run(config["DISCORD_TOKEN"])
