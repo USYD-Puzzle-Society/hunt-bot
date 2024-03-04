@@ -114,10 +114,12 @@ class Admin(commands.GroupCog):
         deleted = await delete_puzzle(puzzle_id.upper())
 
         if not deleted:
-            await interaction.followup.send(f"Puzzle {puzzle_id} does not exist.")
+            await interaction.followup.send(
+                f"Puzzle {puzzle_id.upper()} does not exist."
+            )
             return
 
-        await interaction.followup.send(f"Puzzle {puzzle_id} deleted.")
+        await interaction.followup.send(f"Puzzle {puzzle_id.upper()} deleted.")
 
     @app_commands.command(name="list_puzzles", description="List all created puzzles.")
     @commands.has_role(EXEC_ID)
@@ -129,13 +131,12 @@ class Admin(commands.GroupCog):
         all_puzzle_ids = []
         all_puzzle_name_links = []
         all_puzzle_answers = []
-        for uni_puzzles in all_puzzles:
-            for puzzle in uni_puzzles:
-                all_puzzle_ids.append(puzzle.puzzle_id)
-                all_puzzle_name_links.append(
-                    f"[{puzzle.puzzle_name}]({puzzle.puzzle_link})"
-                )
-                all_puzzle_answers.append(f"||{puzzle.puzzle_answer}||")
+        for puzzle in all_puzzles:
+            all_puzzle_ids.append(puzzle.puzzle_id)
+            all_puzzle_name_links.append(
+                f"[{puzzle.puzzle_name}]({puzzle.puzzle_link})"
+            )
+            all_puzzle_answers.append(f"||{puzzle.puzzle_answer}||")
 
         puzzles_embed = discord.Embed(
             colour=discord.Color.random(),
