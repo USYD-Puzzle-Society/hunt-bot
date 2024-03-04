@@ -1,3 +1,5 @@
+import os
+
 import discord
 from discord.ext import commands
 from discord import app_commands
@@ -5,6 +7,8 @@ from discord import app_commands
 from typing import Literal
 
 from src.queries.puzzle import get_puzzle, create_puzzle, delete_puzzle
+
+from src.config import config
 
 EXEC_ID = "Executives"
 
@@ -45,3 +49,20 @@ class Admin(commands.GroupCog):
             return
 
         await interaction.followup.send(f"Puzzle {puzzle_id} deleted.")
+
+    @app_commands.commands(name="set_hint_channel")
+    @commands.has_role(EXEC_ID)
+    async def set_hint_channel(self, interaction: discord.Interaction):
+        channel = interaction.channel
+
+        await interaction.response.defer()
+
+        # set new channel id in environment variable
+        os.environ["ADMIN_CHANNEL_ID"] = str(channel.id)
+
+        # change the config variable
+        config["ADMIN_CHANNEL_ID"] = channel.id
+
+        await interaction.followup.send(
+            f"Hints will now be redirected to <#{channel.id}>"
+        )
