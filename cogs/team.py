@@ -14,7 +14,7 @@ class Team(commands.GroupCog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(name="create")
+    @app_commands.command(name="create", description="Create a new team.")
     async def create_team(self, interaction: discord.Interaction, team_name: str):
         # check that user is not already in a team
         user = interaction.user
@@ -69,7 +69,7 @@ class Team(commands.GroupCog):
             content=f'Team "{team_name}" created successfully!', ephemeral=True
         )
 
-    @app_commands.command(name="leave")
+    @app_commands.command(name="leave", description="Leave your current team.")
     async def leave_team(self, interaction: discord.Interaction):
         # remove team role from user
         user = interaction.user
@@ -124,7 +124,9 @@ class Team(commands.GroupCog):
         # also delete the team
         await team_query.remove_team(team_name)
 
-    @app_commands.command(name="invite")
+    @app_commands.command(
+        name="invite", description="Invite another member into your team!"
+    )
     async def invite(
         self, interaction: discord.Interaction, invited_user: discord.Member
     ):
