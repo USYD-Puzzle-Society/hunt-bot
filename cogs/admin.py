@@ -121,6 +121,8 @@ class Admin(commands.GroupCog):
     @app_commands.command(name="list_puzzles", description="List all created puzzles.")
     @commands.has_role(EXEC_ID)
     async def list_puzzles(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+
         uts_puzzles = await get_puzzles_by_uni("UTS")
         unsw_puzzles = await get_puzzles_by_uni("UNSW")
         usyd_puzzles = await get_puzzles_by_uni("USYD")
@@ -147,6 +149,8 @@ class Admin(commands.GroupCog):
         puzzles_embed.add_field(name="IDs", value="\n".join(all_puzzle_ids))
         puzzles_embed.add_field(name="Puzzles", value="\n".join(all_puzzle_name_links))
         puzzles_embed.add_field(name="Answers", value="\n".join(all_puzzle_answers))
+
+        await interaction.followup.send(embed=puzzles_embed)
 
     @app_commands.command(
         name="set_hint_channel",
