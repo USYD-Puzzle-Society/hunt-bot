@@ -17,7 +17,7 @@ class Admin(commands.GroupCog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.commands(name="create_puzzle")
+    @app_commands.commands(name="create_puzzle", description="Create a new puzzle")
     @commands.has_role(EXEC_ID)
     async def create_puzzle(
         self,
@@ -30,6 +30,11 @@ class Admin(commands.GroupCog):
         uni: Literal["UTS", "UNSW", "USYD", "METAMETA"],
     ):
         await interaction.response.defer()
+
+        puzzle_exists = await get_puzzle(puzzle_id)
+        if puzzle_exists:
+            await interaction.followup.send(f"Puzzle {puzzle_id} already exists!")
+            return
 
         await create_puzzle(
             puzzle_id, puzzle_name, puzzle_answer, puzzle_author, puzzle_link, uni
