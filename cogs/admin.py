@@ -8,6 +8,7 @@ from typing import Literal
 
 from src.queries.puzzle import (
     get_puzzle,
+    get_all_puzzles,
     get_puzzles_by_uni,
     create_puzzle,
     delete_puzzle,
@@ -110,7 +111,7 @@ class Admin(commands.GroupCog):
     async def delete_puzzle(self, interaction: discord.Interaction, puzzle_id: str):
         await interaction.response.defer()
 
-        deleted = await delete_puzzle(puzzle_id)
+        deleted = await delete_puzzle(puzzle_id.upper())
 
         if not deleted:
             await interaction.followup.send(f"Puzzle {puzzle_id} does not exist.")
@@ -123,11 +124,7 @@ class Admin(commands.GroupCog):
     async def list_puzzles(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
-        uts_puzzles = await get_puzzles_by_uni("UTS")
-        unsw_puzzles = await get_puzzles_by_uni("UNSW")
-        usyd_puzzles = await get_puzzles_by_uni("USYD")
-
-        all_puzzles = [uts_puzzles, unsw_puzzles, usyd_puzzles]
+        all_puzzles = await get_all_puzzles()
 
         all_puzzle_ids = []
         all_puzzle_name_links = []
