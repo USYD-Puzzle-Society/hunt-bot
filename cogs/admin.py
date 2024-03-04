@@ -76,3 +76,7 @@ class Admin(commands.GroupCog):
         await interaction.followup.send(
             f"Hints will now be redirected to <#{channel.id}>"
         )
+
+
+async def setup(bot: commands.Bot):
+    await bot.add_cog(Admin(bot))
