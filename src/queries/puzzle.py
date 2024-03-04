@@ -32,6 +32,7 @@ async def get_puzzles_by_uni(uni: str) -> List[Puzzle]:
         """
         SELECT * FROM public.puzzles as p
         WHERE p.uni = %s
+        ORDER BY ASC
         """,
         (uni,),
     )
