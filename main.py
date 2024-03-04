@@ -62,4 +62,9 @@ async def sync(ctx: commands.context.Context):
         print(e)
 
 
+@bot.command()
+async def clear(ctx: commands.context.Context):
+    bot.tree.clear_commands()
+
+
 bot.run(config["DISCORD_TOKEN"])
