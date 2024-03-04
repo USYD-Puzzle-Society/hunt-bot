@@ -8,13 +8,14 @@ import src.queries.player as player_query
 
 BOT_ID = 1208986388226121849
 MAX_TEAM_SIZE = 6
+EXEC_ID = "Executives"
 
 
 class Team(commands.GroupCog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @app_commands.command(name="create")
+    @app_commands.command(name="create", description="Create a new team.")
     async def create_team(self, interaction: discord.Interaction, team_name: str):
         # check that user is not already in a team
         user = interaction.user
@@ -31,10 +32,18 @@ class Team(commands.GroupCog):
 
         # check team name is not already taken
         if await team_query.get_team(team_name):
-            return await interaction.followup.send(
+            await interaction.followup.send(
                 f'Team "{team_name}" is already taken. Please choose a different team name.',
                 ephemeral=True,
             )
+            return
+
+        # additionally check that the name is not the same as the exec role
+        if team_name.lower() == EXEC_ID.lower():
+            await interaction.followup.send(
+                f'You cannot name yourself "{team_name}". Please choose a different team name.'
+            )
+            return
 
         # if name not taken, add check for profanity and such
         team_role = await guild.create_role(name=team_name)
@@ -69,7 +78,7 @@ class Team(commands.GroupCog):
             content=f'Team "{team_name}" created successfully!', ephemeral=True
         )
 
-    @app_commands.command(name="leave")
+    @app_commands.command(name="leave", description="Leave your current team.")
     async def leave_team(self, interaction: discord.Interaction):
         # remove team role from user
         user = interaction.user
@@ -124,7 +133,9 @@ class Team(commands.GroupCog):
         # also delete the team
         await team_query.remove_team(team_name)
 
-    @app_commands.command(name="invite")
+    @app_commands.command(
+        name="invite", description="Invite another member into your team!"
+    )
     async def invite(
         self, interaction: discord.Interaction, invited_user: discord.Member
     ):
