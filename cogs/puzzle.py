@@ -1,7 +1,6 @@
 from src.config import config
 
 from datetime import datetime
-from typing import Literal
 from zoneinfo import ZoneInfo
 import discord
 from discord.ext import commands
@@ -10,7 +9,7 @@ from discord import app_commands
 from src.queries.puzzle import get_puzzle, get_completed_puzzles
 from src.queries.submission import (
     create_submission,
-    find_submissions_by_player_id_and_puzzle_id,
+    find_submissions_by_discord_id_and_puzzle_id,
 )
 from src.queries.player import get_player
 from src.queries.team import get_team, get_team_members
@@ -34,12 +33,12 @@ class Puzzle(commands.GroupCog):
 
         puzzle_id = puzzle_id.upper()
         puzzle = await get_puzzle(puzzle_id)
-        player = await get_player(str(interaction.user.id))
+        player = await get_player(interaction.user.id)
         if not puzzle or not await can_access_puzzle(puzzle, player.team_name):
             return await interaction.followup.send(
                 "No puzzle with the corresponding ID exists!"
             )
-        submissions = await find_submissions_by_player_id_and_puzzle_id(
+        submissions = await find_submissions_by_discord_id_and_puzzle_id(
             player.discord_id, puzzle_id
         )
 
@@ -91,7 +90,7 @@ class Puzzle(commands.GroupCog):
             team_members = await get_team_members(player.team_name)
 
             for team_member in team_members:
-                discord_member = guild.get_member(int(team_member.discord_id))
+                discord_member = guild.get_member(team_member.discord_id)
                 await discord_member.add_roles(guild.get_role(config["VICTOR_ROLE_ID"]))
 
             await interaction.followup.send(
@@ -105,15 +104,15 @@ class Puzzle(commands.GroupCog):
     @in_team_channel
     async def list_puzzles(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        player = await get_player(str(interaction.user.id))
+        player = await get_player(interaction.user.id)
         puzzles = await get_accessible_puzzles(player.team_name)
         embed = discord.Embed(title="Current Puzzles", color=discord.Color.greyple())
 
         puzzle_ids = []
         puzzle_name_links = []
         for puzzle in puzzles:
-            submissions = await find_submissions_by_player_id_and_puzzle_id(
-                str(player.discord_id), puzzle.puzzle_id
+            submissions = await find_submissions_by_discord_id_and_puzzle_id(
+                player.discord_id, puzzle.puzzle_id
             )
 
             if any([submission.submission_is_correct for submission in submissions]):
@@ -131,7 +130,7 @@ class Puzzle(commands.GroupCog):
     @in_team_channel
     async def hint(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        team = await get_player(str(interaction.user.id))
+        team = await get_player(interaction.user.id)
         await interaction.client.get_channel(config["ADMIN_CHANNEL_ID"]).send(
             f"Hint request submitted from team {team.team_name}! {interaction.channel.mention}"
         )

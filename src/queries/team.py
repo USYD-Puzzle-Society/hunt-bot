@@ -1,6 +1,6 @@
 import psycopg
 from psycopg.rows import class_row
-from datetime import datetime
+from src.models.puzzle import Puzzle
 
 from src.config import config
 from src.models.team import Team
@@ -53,10 +53,10 @@ async def get_team_members(team_name: str):
 
 async def create_team(
     team_name: str,
-    category_channel_id: str,
-    voice_channel_id: str,
-    text_channel_id: str,
-    team_role_id: str,
+    category_channel_id: int,
+    voice_channel_id: int,
+    text_channel_id: int,
+    team_role_id: int,
 ):
     aconn = await psycopg.AsyncConnection.connect(DATABASE_URL)
     acur = aconn.cursor()
@@ -69,10 +69,10 @@ async def create_team(
         """,
         (
             team_name,
-            category_channel_id,
-            voice_channel_id,
-            text_channel_id,
-            team_role_id,
+            str(category_channel_id),
+            str(voice_channel_id),
+            str(text_channel_id),
+            str(team_role_id),
         ),
     )
 

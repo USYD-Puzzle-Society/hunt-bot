@@ -62,8 +62,8 @@ async def find_submissions_by_team(team_name: str):
             return await acur.fetchall()
 
 
-async def find_submissions_by_player_id_and_puzzle_id(
-    player_id: str, puzzle_id: str
+async def find_submissions_by_discord_id_and_puzzle_id(
+    discord_id: int, puzzle_id: str
 ) -> List[Submission]:
     async with await psycopg.AsyncConnection.connect(DATABASE_URL) as aconn:
         async with aconn.cursor(row_factory=class_row(Submission)) as acur:
@@ -75,7 +75,7 @@ async def find_submissions_by_player_id_and_puzzle_id(
                 INNER JOIN public.players AS p ON p.team_name = t.team_name
                 WHERE p.discord_id = %s AND s.puzzle_id = %s
                 """,
-                (player_id, puzzle_id),
+                (str(discord_id), puzzle_id),
             )
 
             return await acur.fetchall()

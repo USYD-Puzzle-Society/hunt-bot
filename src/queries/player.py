@@ -7,7 +7,7 @@ from src.models.player import Player
 DATABASE_URL = config["DATABASE_URL"]
 
 
-async def get_player(discord_id: str):
+async def get_player(discord_id: int):
     aconn = await psycopg.AsyncConnection.connect(DATABASE_URL)
     acur = aconn.cursor(row_factory=class_row(Player))
 
@@ -16,7 +16,7 @@ async def get_player(discord_id: str):
         SELECT * FROM public.players AS p
         WHERE p.discord_id = %s
         """,
-        (discord_id,),
+        (str(discord_id),),
     )
 
     player = await acur.fetchone()
@@ -27,7 +27,7 @@ async def get_player(discord_id: str):
     return player
 
 
-async def add_player(discord_id: str, team_name: str):
+async def add_player(discord_id: int, team_name: str):
     aconn = await psycopg.AsyncConnection.connect(DATABASE_URL)
     acur = aconn.cursor()
 
@@ -37,7 +37,7 @@ async def add_player(discord_id: str, team_name: str):
         (discord_id, team_name)
         VALUES (%s, %s)
         """,
-        (discord_id, team_name),
+        (str(discord_id), team_name),
     )
 
     await aconn.commit()
@@ -46,7 +46,7 @@ async def add_player(discord_id: str, team_name: str):
     await aconn.close()
 
 
-async def remove_player(discord_id: str):
+async def remove_player(discord_id: int):
     aconn = await psycopg.AsyncConnection.connect(DATABASE_URL)
     acur = aconn.cursor()
 
@@ -55,7 +55,7 @@ async def remove_player(discord_id: str):
         DELETE FROM public.players AS p
         WHERE p.discord_id = %s
         """,
-        (discord_id,),
+        (str(discord_id),),
     )
 
     await aconn.commit()

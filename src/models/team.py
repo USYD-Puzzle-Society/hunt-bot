@@ -1,11 +1,10 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 
 
-@dataclass
-class Team:
+class Team(BaseModel):
     team_name: str
-    category_channel_id: str
-    voice_channel_id: str
-    text_channel_id: str
-    team_role_id: str
+    category_channel_id: int
+    voice_channel_id: int
+    text_channel_id: int
+    team_role_id: int
     puzzle_solved: int
