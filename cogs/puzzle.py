@@ -90,7 +90,7 @@ class Puzzle(commands.GroupCog):
             team_members = await get_team_members(player.team_name)
 
             for team_member in team_members:
-                discord_member = guild.get_member(int(team_member.discord_id))
+                discord_member = guild.get_member(team_member.discord_id)
                 await discord_member.add_roles(guild.get_role(config["VICTOR_ROLE_ID"]))
 
             await interaction.followup.send(

@@ -98,8 +98,7 @@ class Team(commands.GroupCog):
         team_name = player.team_name
 
         team = await team_query.get_team(team_name)
-        team_role_id = int(team.team_role_id)
-        role = guild.get_role(team_role_id)
+        role = guild.get_role(team.team_role_id)
 
         await user.remove_roles(role)
 
@@ -120,9 +119,9 @@ class Team(commands.GroupCog):
         )
 
         # if here, then there are no members remaining in the teams
-        text_channel = guild.get_channel(int(team.text_channel_id))
-        voice_channel = guild.get_channel(int(team.voice_channel_id))
-        category_channel = guild.get_channel(int(team.category_channel_id))
+        text_channel = guild.get_channel(team.text_channel_id)
+        voice_channel = guild.get_channel(team.voice_channel_id)
+        category_channel = guild.get_channel(team.category_channel_id)
 
         await text_channel.delete()
         await voice_channel.delete()

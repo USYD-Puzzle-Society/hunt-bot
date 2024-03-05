@@ -1,7 +1,6 @@
-from dataclasses import dataclass
+from pydantic import BaseModel
 
 
-@dataclass
-class Player:
-    discord_id: str
+class Player(BaseModel):
+    discord_id: int
     team_name: str
