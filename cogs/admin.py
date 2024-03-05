@@ -13,6 +13,8 @@ from src.queries.puzzle import (
     create_puzzle,
     delete_puzzle,
 )
+from src.queries.player import get_player, remove_player
+from src.queries.team import get_team, get_team_members, remove_team
 
 from src.config import config
 
@@ -170,6 +172,64 @@ class Admin(commands.GroupCog):
 
         await interaction.followup.send(
             f"Hints will now be redirected to <#{channel.id}>"
+        )
+
+    @app_commands.command(
+        name="kick_member", description="Forcibly removes a member from a team."
+    )
+    @commands.has_role(EXEC_ID)
+    async def kick_member(
+        self, interaction: discord.Interaction, member: discord.Member
+    ):
+        await interaction.response.defer(ephemeral=True)
+
+        guild = interaction.guild
+
+        # get player object from member
+        player = await get_player(str(member.id))
+
+        if not player:
+            await interaction.followup.send(
+                f"{member.display_name} is not part of a team."
+            )
+            return
+
+        team_name = player.team_name
+
+        team = await get_team(team_name)
+        team_role_id = int(team.team_role_id)
+        role = guild.get_role(team_role_id)
+
+        # remove their team role
+        await member.remove_roles(role)
+
+        # delete player
+        await remove_player(str(member.id))
+
+        # delete team if no more members
+        team_members = await get_team_members(team_name)
+
+        if team_members:
+            await interaction.followup.send(
+                f"{member.display_name} has been successfully kicked from {team_name}."
+            )
+            return
+
+        category_channel = guild.get_channel(int(team.category_channel_id))
+        text_channel = guild.get_channel(int(team.text_channel_id))
+        voice_channel = guild.get_channel(int(team.voice_channel_id))
+
+        # delete roles and channels
+        await text_channel.delete()
+        await voice_channel.delete()
+        await category_channel.delete()
+        await role.delete()
+
+        await remove_team(team_name)
+
+        await interaction.followup.send(
+            f"{member.display_name} has been successfully kicked from {team_name}. "
+            + "Since the team is empty, the corresponding roles and channels will be deleted."
         )
 
 
