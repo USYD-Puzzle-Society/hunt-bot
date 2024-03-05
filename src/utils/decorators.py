@@ -15,7 +15,7 @@ def in_team_channel(func: Coroutine) -> Coroutine:
         if not isinstance(user, discord.Member):
             return await interaction.response.send_message("Something went wrong!")
         channel = interaction.channel
-        player = await get_player(str(user.id))
+        player = await get_player(user.id)
 
         if not player:
             return await interaction.response.send_message(

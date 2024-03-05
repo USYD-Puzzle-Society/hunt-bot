@@ -1,7 +1,7 @@
 from typing import List
 from src.models.puzzle import Puzzle
 from src.queries.puzzle import get_puzzles, get_completed_puzzles
-from src.queries.player import get_player
+
 
 NUMBER_OF_FEEDERS = {"UTS": 4, "UNSW": 4, "USYD": 6}
 
