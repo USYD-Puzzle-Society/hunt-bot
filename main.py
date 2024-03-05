@@ -12,8 +12,17 @@ intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="!", help_command=None, intents=intents)
 
 
+async def load_cogs():
+    for filename in os.listdir("cogs/"):
+        if filename.endswith(".py"):
+            await bot.load_extension(f"{COGS_DIR}.{filename[:-3]}")
+            print(f"Loaded {filename}")
+
+
 @bot.event
 async def on_ready():
+    await load_cogs()
+    await bot.tree.sync()
     print(f"Connected as {bot.user}.")
 
 
@@ -21,10 +30,7 @@ async def on_ready():
 @bot.command()
 @commands.has_role(EXEC_ID)
 async def startup(ctx: commands.context.Context):
-    for filename in os.listdir("cogs/"):
-        if filename.endswith(".py"):
-            await bot.load_extension(f"{COGS_DIR}.{filename[:-3]}")
-            print(f"Loaded {filename}")
+    await load_cogs()
     await ctx.send(f"Loaded all cogs")
 
 
