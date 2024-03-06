@@ -6,6 +6,17 @@ from src.queries.player import get_player, remove_player
 from src.queries.team import get_team, get_team_members, remove_team
 
 
+async def get_team_role_and_channels(guild: discord.Guild, team_name: str):
+    team = await get_team(team_name)
+    role = guild.get_role(int(team.team_role_id))
+
+    voice_channel = await guild.get_channel(int(team.voice_channel_id))
+    text_channel = await guild.get_channel(int(team.text_channel_id))
+    category_channel = await guild.get_channel(int(team.category_channel_id))
+
+    return role, [voice_channel, text_channel, category_channel]
+
+
 async def delete_roles_and_channels(
     roles: List[discord.Role],
     channels: List[
@@ -46,9 +57,7 @@ async def remove_member_from_team(
 
     team_name = player.team_name
 
-    team = await get_team(team_name)
-    team_role_id = int(team.team_role_id)
-    role = guild.get_role(team_role_id)
+    role, channels = await get_team_role_and_channels(guild, team_name)
 
     # remove their team role
     await member.remove_roles(role)
@@ -70,14 +79,8 @@ async def remove_member_from_team(
             await interaction.followup.send("You have left the team.", ephemeral=True)
             return
 
-    category_channel = guild.get_channel(team.category_channel_id)
-    text_channel = guild.get_channel(team.text_channel_id)
-    voice_channel = guild.get_channel(team.voice_channel_id)
-
     # delete roles and channels
-    await delete_roles_and_channels(
-        [role], [text_channel, voice_channel, category_channel]
-    )
+    await delete_roles_and_channels([role], channels)
 
     await remove_team(team_name)
 
