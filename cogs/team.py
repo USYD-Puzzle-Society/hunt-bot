@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-from discord import Guild
 
 import src.queries.team as team_query
 import src.queries.player as player_query
@@ -25,7 +24,7 @@ class Team(commands.GroupCog):
 
         await interaction.response.defer(ephemeral=True)
 
-        if await player_query.get_player(str(user.id)):
+        if await player_query.get_player(user.id):
             await interaction.followup.send(
                 "You are already in a team. Please leave the team before creating a new one.",
                 ephemeral=True,
@@ -64,14 +63,14 @@ class Team(commands.GroupCog):
         # create team in database
         await team_query.create_team(
             team_name,
-            str(category.id),
-            str(voice_channel.id),
-            str(text_channel.id),
-            str(team_role.id),
+            category.id,
+            voice_channel.id,
+            text_channel.id,
+            team_role.id,
         )
 
         # add player to database
-        await player_query.add_player(str(user.id), team_name)
+        await player_query.add_player(user.id, team_name)
 
         # give role to user
         await user.add_roles(team_role)
@@ -98,7 +97,7 @@ class Team(commands.GroupCog):
         await interaction.response.defer(ephemeral=True)
 
         # check user is already in a team
-        player = await player_query.get_player(str(user.id))
+        player = await player_query.get_player(user.id)
         if not player:
             await interaction.followup.send(
                 "You must be in a team to use this command.", ephemeral=True
@@ -108,7 +107,7 @@ class Team(commands.GroupCog):
         team_name = player.team_name
 
         # check invited user is not already in a team
-        if await player_query.get_player(str(invited_user.id)):
+        if await player_query.get_player(invited_user.id):
             await interaction.followup.send(
                 "The user you're trying to invite is already in a team.", ephemeral=True
             )
@@ -171,7 +170,7 @@ class Team(commands.GroupCog):
 
             # add new user to team
             await invited_user.add_roles(guild.get_role(int(team.team_role_id)))
-            await player_query.add_player(str(new_player.id), team_name)
+            await player_query.add_player(new_player.id, team_name)
 
             # edit message so that user can't click again
             accept_embed = discord.Embed(
