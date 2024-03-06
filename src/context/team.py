@@ -15,7 +15,7 @@ async def remove_member_from_team(
     guild = interaction.guild
 
     # get player object from member
-    player = await get_player(str(member.id))
+    player = await get_player(member.id)
 
     if not player:
         if kicked:
@@ -39,7 +39,7 @@ async def remove_member_from_team(
     await member.remove_roles(role)
 
     # delete player
-    await remove_player(str(member.id))
+    await remove_player(member.id)
 
     # delete team if no more members
     team_members = await get_team_members(team_name)
@@ -55,9 +55,9 @@ async def remove_member_from_team(
             await interaction.followup.send("You have left the team.", ephemeral=True)
             return
 
-    category_channel = guild.get_channel(int(team.category_channel_id))
-    text_channel = guild.get_channel(int(team.text_channel_id))
-    voice_channel = guild.get_channel(int(team.voice_channel_id))
+    category_channel = guild.get_channel(team.category_channel_id)
+    text_channel = guild.get_channel(team.text_channel_id)
+    voice_channel = guild.get_channel(team.voice_channel_id)
 
     # delete roles and channels
     await text_channel.delete()
