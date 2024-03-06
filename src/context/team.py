@@ -1,7 +1,22 @@
 import discord
 
+from typing import List
+
 from src.queries.player import get_player, remove_player
 from src.queries.team import get_team, get_team_members, remove_team
+
+
+async def delete_roles_and_channels(
+    roles: List[discord.Role],
+    channels: List[
+        discord.TextChannel | discord.VoiceChannel | discord.CategoryChannel
+    ],
+):
+    for role in roles:
+        await role.delete()
+
+    for channel in channels:
+        await channel.delete()
 
 
 # kicked: a True/False value that lets the function know whether the member
@@ -60,10 +75,9 @@ async def remove_member_from_team(
     voice_channel = guild.get_channel(team.voice_channel_id)
 
     # delete roles and channels
-    await text_channel.delete()
-    await voice_channel.delete()
-    await category_channel.delete()
-    await role.delete()
+    await delete_roles_and_channels(
+        [role], [text_channel, voice_channel, category_channel]
+    )
 
     await remove_team(team_name)
 
