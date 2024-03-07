@@ -183,7 +183,29 @@ class Admin(commands.GroupCog):
     async def kick_member(
         self, interaction: discord.Interaction, member: discord.Member
     ):
-        await remove_member_from_team(interaction, member, True)
+        await interaction.response.defer(ephemeral=True)
+        status = await remove_member_from_team(interaction.guild, member)
+
+        if status is None:
+            await interaction.followup.send(
+                f"{member.display_name} is not part of a team.", ephemeral=True
+            )
+            return
+
+        elif status == "removed":
+            await interaction.followup.send(
+                f"{member.display_name} has been successfully kicked from the team.",
+                ephemeral=True,
+            )
+            return
+
+        elif status == "deleted":
+            await interaction.followup.send(
+                f"{member.display_name} has been successfully kicked from the team. "
+                + "Since the team is empty, the corresponding roles and channels will be deleted.",
+                ephemeral=True,
+            )
+            return
 
 
 async def setup(bot: commands.Bot):

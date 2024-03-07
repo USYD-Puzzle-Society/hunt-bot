@@ -81,9 +81,28 @@ class Team(commands.GroupCog):
 
     @app_commands.command(name="leave", description="Leave your current team.")
     async def leave_team(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+
         user = interaction.user
 
-        await remove_member_from_team(interaction, user, False)
+        status = await remove_member_from_team(interaction.guild, user)
+
+        if status is None:
+            await interaction.followup.send(
+                "You are not part of a team.", ephemeral=True
+            )
+            return
+
+        elif status == "removed":
+            await interaction.followup.send("You have left the team.", ephemeral=True)
+            return
+
+        elif status == "deleted":
+            await interaction.followup.send(
+                "You have left the team. Since there are no members left, the channels will be deleted.",
+                ephemeral=True,
+            )
+            return
 
     @app_commands.command(
         name="invite", description="Invite another member into your team!"
