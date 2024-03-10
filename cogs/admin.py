@@ -259,6 +259,19 @@ class Admin(commands.GroupCog):
             f"{member.display_name} is now part of the {team_name}!", ephemeral=True
         )
 
+    @app_commands.command(
+        name="get_team_name",
+        description="Gets the team name of the current channel you're in.",
+    )
+    @commands.has_role(EXEC_ID)
+    async def get_team_name(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+
+        category = interaction.channel.category
+        vc = category.voice_channels[0]
+
+        await interaction.followup.send(vc.name)
+
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Admin(bot))
