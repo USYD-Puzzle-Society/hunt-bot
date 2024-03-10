@@ -15,7 +15,7 @@ from src.queries.puzzle import (
     create_puzzle,
     delete_puzzle,
 )
-from src.queries.player import get_player, remove_player
+from src.queries.player import get_player, remove_player, add_player
 from src.queries.team import get_team, get_team_members, remove_team
 
 from src.config import config
@@ -23,6 +23,7 @@ from src.config import config
 from src.context.team import remove_member_from_team
 
 EXEC_ID = "Executives"
+MAX_TEAM_SIZE = 6
 
 
 class Admin(commands.GroupCog):
@@ -212,6 +213,64 @@ class Admin(commands.GroupCog):
                 return
 
             return
+
+    @app_commands.command(
+        name="add_member",
+        description="Adds someone to a team. Only use this when they are unable to be invited.",
+    )
+    @commands.has_role(EXEC_ID)
+    async def add_member(
+        self,
+        interaction: discord.Interaction,
+        member: discord.Member,
+        team_name: str,
+    ):
+        await interaction.response.defer(ephemeral=True)
+
+        guild = interaction.guild
+
+        player = await get_player(member.id)
+        if player:
+            await interaction.followup.send(
+                f"{member.display_name} is already in a team.", ephemeral=True
+            )
+            return
+
+        team = await get_team(team_name)
+        if not team:
+            await interaction.followup.send(
+                f"{team_name} does not exist. Did you type the name correctly?",
+                ephemeral=True,
+            )
+            return
+
+        team_members = await get_team_members(team_name)
+        if len(team_members) == MAX_TEAM_SIZE:
+            await interaction.followup.send(f"{team_name} is full!", ephemeral=True)
+            return
+
+        # if all checks pass, add the member to the team
+        await add_player(member.id, team_name)
+
+        # give member the team role
+        await member.add_roles(guild.get_role(team.team_role_id))
+
+        await interaction.followup.send(
+            f"{member.display_name} is now part of the {team_name}!", ephemeral=True
+        )
+
+    @app_commands.command(
+        name="get_team_name",
+        description="Gets the team name of the current channel you're in.",
+    )
+    @commands.has_role(EXEC_ID)
+    async def get_team_name(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+
+        category = interaction.channel.category
+        vc = category.voice_channels[0]
+
+        await interaction.followup.send(vc.name)
 
 
 async def setup(bot: commands.Bot):
