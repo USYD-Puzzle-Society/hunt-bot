@@ -59,13 +59,13 @@ async def remove_member_from_team(guild: discord.Guild, member: discord.Member):
 
     team_name = player.team_name
 
-    channels = await get_team_channels(guild, team_name)
-
     # delete team if no more members
     team_members = await get_team_members(team_name)
 
     if team_members:
         return "removed"
+
+    channels = await get_team_channels(guild, team_name)
 
     # delete roles and channels
     await delete_roles_and_channels([role], channels)
