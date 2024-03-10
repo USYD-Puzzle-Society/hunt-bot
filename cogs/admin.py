@@ -4,6 +4,8 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
+from discord.app_commands.errors import CommandInvokeError
+
 from typing import Literal
 
 from src.queries.puzzle import (
@@ -13,8 +15,12 @@ from src.queries.puzzle import (
     create_puzzle,
     delete_puzzle,
 )
+from src.queries.player import get_player, remove_player
+from src.queries.team import get_team, get_team_members, remove_team
 
 from src.config import config
+
+from src.context.team import remove_member_from_team
 
 EXEC_ID = "Executives"
 
@@ -171,6 +177,41 @@ class Admin(commands.GroupCog):
         await interaction.followup.send(
             f"Hints will now be redirected to <#{channel.id}>"
         )
+
+    @app_commands.command(
+        name="remove_member", description="Forcibly removes a member from a team."
+    )
+    @commands.has_role(EXEC_ID)
+    async def remove_member(
+        self, interaction: discord.Interaction, member: discord.Member
+    ):
+        await interaction.response.defer(ephemeral=True)
+        status = await remove_member_from_team(interaction.guild, member)
+
+        if status is None:
+            await interaction.followup.send(
+                f"{member.display_name} is not part of a team.", ephemeral=True
+            )
+            return
+
+        elif status == "removed":
+            await interaction.followup.send(
+                f"{member.display_name} has been successfully kicked from the team.",
+                ephemeral=True,
+            )
+            return
+
+        elif status == "deleted":
+            try:
+                await interaction.followup.send(
+                    f"{member.display_name} has been successfully kicked from the team. "
+                    + "Since the team is empty, the corresponding roles and channels will be deleted.",
+                    ephemeral=True,
+                )
+            except CommandInvokeError:
+                return
+
+            return
 
 
 async def setup(bot: commands.Bot):

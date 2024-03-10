@@ -2,8 +2,12 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
+from discord.app_commands.errors import CommandInvokeError
+
 import src.queries.team as team_query
 import src.queries.player as player_query
+
+from src.context.team import remove_member_from_team
 
 BOT_ID = 1208986388226121849
 MAX_TEAM_SIZE = 6
@@ -79,57 +83,32 @@ class Team(commands.GroupCog):
 
     @app_commands.command(name="leave", description="Leave your current team.")
     async def leave_team(self, interaction: discord.Interaction):
-        # remove team role from user
-        user = interaction.user
-        guild = interaction.guild
-
         await interaction.response.defer(ephemeral=True)
 
-        # get the team name from the user
-        discord_id = user.id
-        player = await player_query.get_player(discord_id)
+        user = interaction.user
 
-        if not player:
+        status = await remove_member_from_team(interaction.guild, user)
+
+        if status is None:
             await interaction.followup.send(
                 "You are not part of a team.", ephemeral=True
             )
             return
 
-        team_name = player.team_name
-
-        team = await team_query.get_team(team_name)
-        role = guild.get_role(team.team_role_id)
-
-        await user.remove_roles(role)
-
-        # delete player
-        await player_query.remove_player(discord_id)
-
-        # check amount of people still in team
-        # if none, delete team and respective channels
-        # also delete the role
-        team_members = await team_query.get_team_members(team_name)
-        if team_members:
+        elif status == "removed":
             await interaction.followup.send("You have left the team.", ephemeral=True)
             return
 
-        await interaction.followup.send(
-            "You have left the team. Since there are no members left in the team, the channels will be deleted.",
-            ephemeral=True,
-        )
+        elif status == "deleted":
+            try:
+                await interaction.followup.send(
+                    "You have left the team. Since there are no members left, the channels will be deleted.",
+                    ephemeral=True,
+                )
+            except CommandInvokeError:
+                return
 
-        # if here, then there are no members remaining in the teams
-        text_channel = guild.get_channel(team.text_channel_id)
-        voice_channel = guild.get_channel(team.voice_channel_id)
-        category_channel = guild.get_channel(team.category_channel_id)
-
-        await text_channel.delete()
-        await voice_channel.delete()
-        await category_channel.delete()
-        await role.delete()
-
-        # also delete the team
-        await team_query.remove_team(team_name)
+            return
 
     @app_commands.command(
         name="invite", description="Invite another member into your team!"
