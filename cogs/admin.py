@@ -179,7 +179,7 @@ class Admin(commands.GroupCog):
         )
 
     @app_commands.command(
-        name="kick_member", description="Forcibly removes a member from a team."
+        name="remove_member", description="Forcibly removes a member from a team."
     )
     @commands.has_role(EXEC_ID)
     async def kick_member(
