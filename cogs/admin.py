@@ -220,7 +220,10 @@ class Admin(commands.GroupCog):
     )
     @commands.has_role(EXEC_ID)
     async def add_member(
-        self, interaction: discord.Interaction, member: discord.Member, team_name: str
+        self,
+        interaction: discord.Interaction,
+        member: discord.Member,
+        team_name: str,
     ):
         await interaction.response.defer(ephemeral=True)
 
