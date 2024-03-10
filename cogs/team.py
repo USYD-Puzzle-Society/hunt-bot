@@ -2,6 +2,8 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
+from discord.app_commands.errors import CommandInvokeError
+
 import src.queries.team as team_query
 import src.queries.player as player_query
 
@@ -98,10 +100,14 @@ class Team(commands.GroupCog):
             return
 
         elif status == "deleted":
-            await interaction.followup.send(
-                "You have left the team. Since there are no members left, the channels will be deleted.",
-                ephemeral=True,
-            )
+            try:
+                await interaction.followup.send(
+                    "You have left the team. Since there are no members left, the channels will be deleted.",
+                    ephemeral=True,
+                )
+            except CommandInvokeError:
+                return
+
             return
 
     @app_commands.command(

@@ -4,6 +4,8 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
+from discord.app_commands.errors import CommandInvokeError
+
 from typing import Literal
 
 from src.queries.puzzle import (
@@ -200,11 +202,15 @@ class Admin(commands.GroupCog):
             return
 
         elif status == "deleted":
-            await interaction.followup.send(
-                f"{member.display_name} has been successfully kicked from the team. "
-                + "Since the team is empty, the corresponding roles and channels will be deleted.",
-                ephemeral=True,
-            )
+            try:
+                await interaction.followup.send(
+                    f"{member.display_name} has been successfully kicked from the team. "
+                    + "Since the team is empty, the corresponding roles and channels will be deleted.",
+                    ephemeral=True,
+                )
+            except CommandInvokeError:
+                return
+
             return
 
 
