@@ -11,9 +11,9 @@ from src.models.player import Player
 async def get_team_channels(guild: discord.Guild, team_name: str):
     team = await get_team(team_name)
 
-    voice_channel = guild.get_channel(int(team.voice_channel_id))
-    text_channel = guild.get_channel(int(team.text_channel_id))
-    category_channel = guild.get_channel(int(team.category_channel_id))
+    voice_channel = guild.get_channel(team.voice_channel_id)
+    text_channel = guild.get_channel(team.text_channel_id)
+    category_channel = guild.get_channel(team.category_channel_id)
 
     return [voice_channel, text_channel, category_channel]
 
