@@ -222,10 +222,17 @@ class Team(commands.GroupCog):
         accept_btn.callback = accept_callback
         reject_btn.callback = reject_callback
 
-        await invited_user.send(embed=embed, view=view)
-        await interaction.followup.send(
-            f"{invited_user} has been invited to your team.", ephemeral=True
-        )
+        try:
+            await invited_user.send(embed=embed, view=view)
+            await interaction.followup.send(
+                f"{invited_user.display_name} has been invited to your team.",
+                ephemeral=True,
+            )
+        except CommandInvokeError:
+            await interaction.followup.send(
+                f"{invited_user.display_name} cannot be invited. This may be because they can't receive DMs from this bot."
+                + "Tag an exec and they can add the member to your team for you!"
+            )
 
 
 async def setup(bot: commands.Bot):
