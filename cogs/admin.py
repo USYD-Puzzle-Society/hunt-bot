@@ -182,7 +182,7 @@ class Admin(commands.GroupCog):
         name="remove_member", description="Forcibly removes a member from a team."
     )
     @commands.has_role(EXEC_ID)
-    async def kick_member(
+    async def remove_member(
         self, interaction: discord.Interaction, member: discord.Member
     ):
         await interaction.response.defer(ephemeral=True)
