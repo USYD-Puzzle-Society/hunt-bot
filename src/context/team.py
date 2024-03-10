@@ -46,9 +46,6 @@ async def remove_role_and_player(
     return role
 
 
-# kicked: a True/False value that lets the function know whether the member
-# is leaving the team on their own or is being kicked from the team by
-# an admin
 async def remove_member_from_team(guild: discord.Guild, member: discord.Member):
     player = await get_player(member.id)
 
