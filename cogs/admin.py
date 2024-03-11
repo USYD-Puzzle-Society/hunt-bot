@@ -22,7 +22,7 @@ from src.config import config
 
 from src.context.team import remove_member_from_team
 
-EXEC_ID = "Executives"
+EXEC_ID = config["EXEC_ID"]
 MAX_TEAM_SIZE = 6
 
 

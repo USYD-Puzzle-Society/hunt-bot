@@ -6,7 +6,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-from src.queries.puzzle import get_puzzle, get_completed_puzzles
+from src.queries.puzzle import get_puzzle
 from src.queries.submission import (
     create_submission,
     find_submissions_by_discord_id_and_puzzle_id,
@@ -17,7 +17,9 @@ from src.queries.team import get_team, get_team_members
 from src.utils.decorators import in_team_channel
 from src.context.puzzle import can_access_puzzle, get_accessible_puzzles
 
-EXEC_ID = "Executives"
+EXEC_ID = config["EXEC_ID"]
+
+HUNT_START_TIME: datetime = config["HUNT_START_TIME"]
 
 
 class Puzzle(commands.GroupCog):
@@ -30,6 +32,11 @@ class Puzzle(commands.GroupCog):
         self, interaction: discord.Interaction, puzzle_id: str, answer: str
     ):
         await interaction.response.defer()
+
+        if datetime.now(tz=ZoneInfo("Australia/Sydney")) < HUNT_START_TIME:
+            return await interaction.followup.send(
+                "The hunt has not started yet :pensive:"
+            )
 
         puzzle_id = puzzle_id.upper()
         puzzle = await get_puzzle(puzzle_id)
@@ -104,6 +111,12 @@ class Puzzle(commands.GroupCog):
     @in_team_channel
     async def list_puzzles(self, interaction: discord.Interaction):
         await interaction.response.defer()
+
+        if datetime.now(tz=ZoneInfo("Australia/Sydney")) < HUNT_START_TIME:
+            return await interaction.followup.send(
+                "The hunt has not started yet :pensive:"
+            )
+
         player = await get_player(interaction.user.id)
         puzzles = await get_accessible_puzzles(player.team_name)
         embed = discord.Embed(title="Current Puzzles", color=discord.Color.greyple())
