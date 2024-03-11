@@ -130,14 +130,14 @@ async def delete_puzzle(puzzle_id: str):
     return True
 
 
-async def get_leaderboard():
+async def get_leaderboard() -> tuple[str, int]:
     aconn = await psycopg.AsyncConnection.connect(DATABASE_URL)
-    acur = aconn.cursor(row_factory=dict_row)
+    acur = aconn.cursor()
 
     await acur.execute(
         """
         SELECT t.team_name, t.puzzle_solved
-        FROM public.teams AS t JOIN public.submissions AS s
+        FROM public.teams AS t LEFT JOIN public.submissions AS s
         ON (t.team_name = s.team_name)
         ORDER BY t.puzzle_solved DESC, s.submission_time ASC
         """
