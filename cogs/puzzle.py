@@ -5,8 +5,9 @@ from zoneinfo import ZoneInfo
 import discord
 from discord.ext import commands
 from discord import app_commands
+from discord.ui import View, view, Button, button
 
-from src.queries.puzzle import get_puzzle, get_completed_puzzles
+from src.queries.puzzle import get_puzzle, get_completed_puzzles, get_leaderboard
 from src.queries.submission import (
     create_submission,
     find_submissions_by_discord_id_and_puzzle_id,
@@ -20,9 +21,74 @@ from src.context.puzzle import can_access_puzzle, get_accessible_puzzles
 EXEC_ID = "Executives"
 
 
+class PaginationView(View):
+    def __init__(self, pages):
+        super().__init__()
+
+        self.page_num = 0
+        self.pages = pages
+
+    @button(
+        label="<",
+        style=discord.ButtonStyle.blurple,
+    )
+    async def prev_button(self, interaction: discord.Interaction, button: Button):
+        await interaction.response.defer()
+
+        if self.page_num > 0:
+            self.page_num += -1
+
+        await interaction.followup.edit_message(
+            message_id=interaction.message.id, embed=self.pages[self.page_num]
+        )
+
+    @button(
+        label=">",
+        style=discord.ButtonStyle.blurple,
+    )
+    async def next_button(self, interaction: discord.Interaction, button: Button):
+        await interaction.response.defer()
+
+        if self.page_num < len(self.pages) - 1:
+            self.page_num += 1
+
+        await interaction.followup.edit_message(
+            message_id=interaction.message.id, embed=self.pages[self.page_num]
+        )
+
+
 class Puzzle(commands.GroupCog):
     def __init__(self, bot):
         self.bot = bot
+
+    def update_leaderboard(self, new_embeds: list[discord.Embed]):
+        self.leaderboard_embeds = new_embeds
+
+    @discord.ui.button(custom_id="next")
+    async def prev_button(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
+        await interaction.response.defer()
+        if self.page_num > 0:
+            self.page_num += -1
+
+        await interaction.followup.edit_message(
+            message_id=interaction.message.id,
+            embed=self.leaderboard_embeds[self.page_num],
+        )
+
+    @discord.ui.button(custom_id="next")
+    async def next_button(
+        self, interaction: discord.Interaction, button: discord.ui.Button
+    ):
+        await interaction.response.defer()
+        if self.page_num < len(self.leaderboard_embeds) - 1:
+            self.page_num += 1
+
+        await interaction.followup.edit_message(
+            message_id=interaction.message.id,
+            embed=self.leaderboard_embeds[self.page_num],
+        )
 
     @app_commands.command(name="submit", description="Submit an answer to a puzzle")
     @in_team_channel
@@ -136,6 +202,53 @@ class Puzzle(commands.GroupCog):
         )
         await interaction.followup.send(
             "Your hint request has been submitted! Hang on tight - a hint giver will be with you shortly."
+        )
+
+    @app_commands.command(
+        name="leaderboard", description="Displays the current leaderboard for teams."
+    )
+    async def leaderboard(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+
+        leaderboard_values = await get_leaderboard()
+        TEAMS_PER_EMBED = 2
+        num_vals = len(leaderboard_values)
+        if num_vals == 0:
+            await interaction.followup.send("There are no teams at this time.")
+            return
+
+        # getting the ceiling value. i didn't want to import math
+        num_embeds = (
+            (num_vals // TEAMS_PER_EMBED) + 1
+            if num_vals % TEAMS_PER_EMBED != 0
+            else num_vals // TEAMS_PER_EMBED
+        )
+
+        # each embed will display ten teams
+        leaderboard_embeds = [
+            discord.Embed(
+                title="Leaderboard",
+                description="Teams are sorted by the number of puzzles solved. Ties are broken by the latest correct submission time for each tied team.",
+            )
+            for _ in range(num_embeds)
+        ]
+        leaderboard_text = [("", "") for _ in range(num_embeds)]
+        for i, val in enumerate(leaderboard_values):
+            team_name, puzzles_solved = val
+
+            team_str, puzzles_solved_str = leaderboard_text[i // TEAMS_PER_EMBED]
+            team_str += f"{i+1}. {team_name}\n"
+            puzzles_solved_str += f"{puzzles_solved}\n"
+
+            leaderboard_text[i // TEAMS_PER_EMBED] = (team_str, puzzles_solved_str)
+
+        print(leaderboard_text)
+        for page_num, embed in enumerate(leaderboard_embeds):
+            embed.add_field(name="Team", value=leaderboard_text[page_num][0])
+            embed.add_field(name="Puzzles Solved", value=leaderboard_text[page_num][1])
+
+        await interaction.followup.send(
+            embed=leaderboard_embeds[0], view=PaginationView(leaderboard_embeds)
         )
 
 
