@@ -143,7 +143,7 @@ async def get_leaderboard():
         """
     )
 
-    leaderboard = acur.fetchall()
+    leaderboard = await acur.fetchall()
 
     await acur.close()
     await aconn.close()
