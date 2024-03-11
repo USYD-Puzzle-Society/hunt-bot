@@ -2,7 +2,9 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
-EXEC_ID = "Executives"
+from src.config import config
+
+EXEC_ID = config["EXEC_ID"]
 
 
 class Help(commands.GroupCog):

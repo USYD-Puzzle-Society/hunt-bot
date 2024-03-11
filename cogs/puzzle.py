@@ -17,11 +17,9 @@ from src.queries.team import get_team, get_team_members
 from src.utils.decorators import in_team_channel
 from src.context.puzzle import can_access_puzzle, get_accessible_puzzles
 
-EXEC_ID = "Executives"
+EXEC_ID = config["EXEC_ID"]
 
-HUNT_START_TIME: datetime = datetime(
-    2024, 3, 16, 9, 15, tzinfo=ZoneInfo("Australia/Sydney")
-)
+HUNT_START_TIME: datetime = config["HUNT_START_TIME"]
 
 
 class Puzzle(commands.GroupCog):
