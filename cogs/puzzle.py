@@ -13,7 +13,7 @@ from src.queries.submission import (
     find_submissions_by_discord_id_and_puzzle_id,
 )
 from src.queries.player import get_player
-from src.queries.team import get_team, get_team_members
+from src.queries.team import get_team, get_team_members, increase_puzzles_solved
 
 from src.utils.decorators import in_team_channel
 from src.context.puzzle import can_access_puzzle, get_accessible_puzzles
@@ -125,6 +125,8 @@ class Puzzle(commands.GroupCog):
 
         if not submission_is_correct:
             return await interaction.followup.send("The submitted answer is incorrect!")
+        else:
+            await increase_puzzles_solved(player.team_name)
 
         # check if they have solved all the metas
         if puzzle_id == "UTS-M":
@@ -211,7 +213,7 @@ class Puzzle(commands.GroupCog):
         await interaction.response.defer()
 
         leaderboard_values = await get_leaderboard()
-        TEAMS_PER_EMBED = 2
+        TEAMS_PER_EMBED = 10
         num_vals = len(leaderboard_values)
         if num_vals == 0:
             await interaction.followup.send("There are no teams at this time.")
@@ -228,7 +230,9 @@ class Puzzle(commands.GroupCog):
         leaderboard_embeds = [
             discord.Embed(
                 title="Leaderboard",
-                description="Teams are sorted by the number of puzzles solved. Ties are broken by the latest correct submission time for each tied team.",
+                description="Teams are sorted by the number of puzzles solved."
+                + "Ties are broken by the latest correct submission time for each tied team.",
+                color=discord.Color.random(),
             )
             for _ in range(num_embeds)
         ]
