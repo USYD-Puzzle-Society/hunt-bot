@@ -64,32 +64,6 @@ class Puzzle(commands.GroupCog):
     def update_leaderboard(self, new_embeds: list[discord.Embed]):
         self.leaderboard_embeds = new_embeds
 
-    @discord.ui.button(custom_id="next")
-    async def prev_button(
-        self, interaction: discord.Interaction, button: discord.ui.Button
-    ):
-        await interaction.response.defer()
-        if self.page_num > 0:
-            self.page_num += -1
-
-        await interaction.followup.edit_message(
-            message_id=interaction.message.id,
-            embed=self.leaderboard_embeds[self.page_num],
-        )
-
-    @discord.ui.button(custom_id="next")
-    async def next_button(
-        self, interaction: discord.Interaction, button: discord.ui.Button
-    ):
-        await interaction.response.defer()
-        if self.page_num < len(self.leaderboard_embeds) - 1:
-            self.page_num += 1
-
-        await interaction.followup.edit_message(
-            message_id=interaction.message.id,
-            embed=self.leaderboard_embeds[self.page_num],
-        )
-
     @app_commands.command(name="submit", description="Submit an answer to a puzzle")
     @in_team_channel
     async def submit_answer(
@@ -213,7 +187,7 @@ class Puzzle(commands.GroupCog):
         await interaction.response.defer()
 
         leaderboard_values = await get_leaderboard()
-        TEAMS_PER_EMBED = 10
+        TEAMS_PER_EMBED = 1
         num_vals = len(leaderboard_values)
         if num_vals == 0:
             await interaction.followup.send("There are no teams at this time.")
