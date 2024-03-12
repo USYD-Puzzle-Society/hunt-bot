@@ -139,7 +139,9 @@ async def get_leaderboard() -> tuple[str, int]:
         SELECT t.team_name, t.puzzle_solved
         FROM public.teams AS t LEFT JOIN public.submissions AS s
         ON (t.team_name = s.team_name)
-        ORDER BY t.puzzle_solved DESC, s.submission_time ASC
+        AND s.submission_is_correct = TRUE
+        GROUP BY t.team_name
+        ORDER BY t.puzzle_solved DESC, MAX(s.submission_time) ASC
         """
     )
 
