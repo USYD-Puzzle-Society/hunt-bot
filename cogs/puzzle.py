@@ -246,7 +246,6 @@ class Puzzle(commands.GroupCog):
 
             leaderboard_text[i // TEAMS_PER_EMBED] = (team_str, puzzles_solved_str)
 
-        print(leaderboard_text)
         for page_num, embed in enumerate(leaderboard_embeds):
             embed.add_field(name="Team", value=leaderboard_text[page_num][0])
             embed.add_field(name="Puzzles Solved", value=leaderboard_text[page_num][1])
