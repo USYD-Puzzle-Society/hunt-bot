@@ -105,7 +105,7 @@ class Team(commands.GroupCog):
                     "You have left the team. Since there are no members left, the channels will be deleted.",
                     ephemeral=True,
                 )
-            except CommandInvokeError:
+            except discord.errors.NotFound:
                 return
 
             return
