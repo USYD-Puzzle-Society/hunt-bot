@@ -187,7 +187,7 @@ class Puzzle(commands.GroupCog):
         await interaction.response.defer()
 
         leaderboard_values = await get_leaderboard()
-        TEAMS_PER_EMBED = 1
+        TEAMS_PER_EMBED = 10
         num_vals = len(leaderboard_values)
         if num_vals == 0:
             await interaction.followup.send("There are no teams at this time.")
