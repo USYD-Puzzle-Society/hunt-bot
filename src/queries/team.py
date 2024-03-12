@@ -129,8 +129,9 @@ async def increase_puzzles_solved(team_name: str):
         """
         UPDATE public.teams
         SET puzzle_solved = %s
+        WHERE team_name = %s
         """,
-        (puzzles_solved + 1,),
+        (puzzles_solved + 1, team_name),
     )
 
     await aconn.commit()
