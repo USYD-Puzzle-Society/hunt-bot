@@ -123,7 +123,6 @@ async def increase_puzzles_solved(team_name: str):
     )
 
     puzzles_solved = (await acur.fetchone())[0]
-    print(puzzles_solved)
 
     await acur.execute(
         """
