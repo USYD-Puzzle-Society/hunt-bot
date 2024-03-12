@@ -6,12 +6,12 @@ from discord.app_commands.errors import CommandInvokeError
 
 import src.queries.team as team_query
 import src.queries.player as player_query
+from src.config import config
 
 from src.context.team import remove_member_from_team
 
-BOT_ID = 1208986388226121849
 MAX_TEAM_SIZE = 6
-EXEC_ID = "Executives"
+EXEC_ID = config["EXEC_ID"]
 
 
 class Team(commands.GroupCog):

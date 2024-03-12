@@ -3,8 +3,7 @@ from discord.ext import commands
 from src.config import config
 import os
 
-TOKEN = ""
-EXEC_ID = "Executives"
+EXEC_ID = config["EXEC_ID"]
 COGS_DIR = "cogs"
 
 intents = discord.Intents.all()

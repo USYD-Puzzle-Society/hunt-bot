@@ -18,7 +18,9 @@ from src.queries.team import get_team, get_team_members, increase_puzzles_solved
 from src.utils.decorators import in_team_channel
 from src.context.puzzle import can_access_puzzle, get_accessible_puzzles
 
-EXEC_ID = "Executives"
+EXEC_ID = config["EXEC_ID"]
+
+HUNT_START_TIME: datetime = config["HUNT_START_TIME"]
 
 
 class PaginationView(View):
@@ -70,6 +72,11 @@ class Puzzle(commands.GroupCog):
         self, interaction: discord.Interaction, puzzle_id: str, answer: str
     ):
         await interaction.response.defer()
+
+        if datetime.now(tz=ZoneInfo("Australia/Sydney")) < HUNT_START_TIME:
+            return await interaction.followup.send(
+                "The hunt has not started yet :pensive:"
+            )
 
         puzzle_id = puzzle_id.upper()
         puzzle = await get_puzzle(puzzle_id)
@@ -146,6 +153,12 @@ class Puzzle(commands.GroupCog):
     @in_team_channel
     async def list_puzzles(self, interaction: discord.Interaction):
         await interaction.response.defer()
+
+        if datetime.now(tz=ZoneInfo("Australia/Sydney")) < HUNT_START_TIME:
+            return await interaction.followup.send(
+                "The hunt has not started yet :pensive:"
+            )
+
         player = await get_player(interaction.user.id)
         puzzles = await get_accessible_puzzles(player.team_name)
         embed = discord.Embed(title="Current Puzzles", color=discord.Color.greyple())
