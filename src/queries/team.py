@@ -101,3 +101,38 @@ async def remove_team(team_name: str):
     await aconn.commit()
     await acur.close()
     await aconn.close()
+
+
+async def increase_puzzles_solved(team_name: str):
+    aconn = await psycopg.AsyncConnection.connect(DATABASE_URL)
+    acur = aconn.cursor()
+
+    # this should never run since the team name should always be
+    # valid when calling this function
+    if not await get_team(team_name):
+        return False
+
+    # get the current number of solved puzzles by the team
+    await acur.execute(
+        """
+        SELECT t.puzzle_solved
+        FROM public.teams AS t
+        WHERE t.team_name = %s
+        """,
+        (team_name,),
+    )
+
+    puzzles_solved = (await acur.fetchone())[0]
+    print(puzzles_solved)
+
+    await acur.execute(
+        """
+        UPDATE public.teams
+        SET puzzle_solved = %s
+        """,
+        (puzzles_solved + 1,),
+    )
+
+    await aconn.commit()
+    await acur.close()
+    await aconn.close()
