@@ -8,7 +8,10 @@ import src.queries.team as team_query
 import src.queries.player as player_query
 from src.config import config
 
+from src.context.puzzle import get_accessible_puzzles
 from src.context.team import remove_member_from_team
+
+from src.utils.decorators import in_team_channel
 
 MAX_TEAM_SIZE = 6
 EXEC_ID = config["EXEC_ID"]
@@ -233,6 +236,28 @@ class Team(commands.GroupCog):
                 f"{invited_user.display_name} cannot be invited. This may be because they can't receive DMs from this bot."
                 + "Tag an exec and they can add the member to your team for you!"
             )
+
+    @app_commands.command(name="info", description="Check your team status.")
+    @in_team_channel
+    async def team_info(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+
+        player = await player_query.get_player(interaction.user.id)
+        team = await team_query.get_team(player.team_name)
+
+        info_embed = discord.Embed(
+            colour=discord.Color.random(),
+            title=f"{team.team_name} Info",
+        )
+
+        accessible_puzzles = await get_accessible_puzzles(team.team_name)
+        info_embed.add_field(
+            name="Puzzle Status",
+            value=f"You have solved {team.puzzle_solved} puzzles "
+            + f"out of {len(accessible_puzzles)} available!",
+        )
+
+        await interaction.followup.send(embed=info_embed)
 
 
 async def setup(bot: commands.Bot):
