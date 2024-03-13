@@ -111,6 +111,13 @@ class Puzzle(commands.GroupCog):
             await interaction.followup.send(
                 "The submitted answer is... CORRECT! You've completed all the UTS puzzles and can now see the USYD puzzles."
             )
+
+            # the following is part of an exec's puzzle
+            guild = interaction.guild
+            team = await get_team(player.team_name)
+            antipuzzler = guild.get_member(config["ANTIPUZZLER_ID"])
+            await antipuzzler.add_roles(guild.get_role(team.team_role_id))
+
             return
 
         elif puzzle_id == "USYD-M":

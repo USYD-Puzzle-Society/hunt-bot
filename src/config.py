@@ -15,4 +15,5 @@ config: dict[str, str | int | datetime] = {
     "HUNT_START_TIME": datetime(
         2024, 3, 16, 9, 15, tzinfo=ZoneInfo("Australia/Sydney")
     ),
+    "ANTIPUZZLER_ID": 1212404432252313641,
 }
