@@ -7,13 +7,18 @@ from discord.ext import commands
 from discord import app_commands
 from discord.ui import View, view, Button, button
 
-from src.queries.puzzle import get_puzzle, get_completed_puzzles, get_leaderboard
+from src.queries.puzzle import get_puzzle, get_leaderboard
 from src.queries.submission import (
     create_submission,
     find_submissions_by_discord_id_and_puzzle_id,
 )
 from src.queries.player import get_player
-from src.queries.team import get_team, get_team_members, increase_puzzles_solved
+from src.queries.team import (
+    get_team,
+    get_team_members,
+    increase_puzzles_solved,
+    increase_hints_used,
+)
 
 from src.utils.decorators import in_team_channel
 from src.context.puzzle import can_access_puzzle, get_accessible_puzzles
@@ -182,9 +187,15 @@ class Puzzle(commands.GroupCog):
     @in_team_channel
     async def hint(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        team = await get_player(interaction.user.id)
+
+        player = await get_player(interaction.user.id)
+
+        await check_if_max_hints(player.team_name)
+
+        await increase_hints_used(player.team_name)
+
         await interaction.client.get_channel(config["ADMIN_CHANNEL_ID"]).send(
-            f"Hint request submitted from team {team.team_name}! {interaction.channel.mention}"
+            f"Hint request submitted from team {player.team_name}! {interaction.channel.mention}"
         )
         await interaction.followup.send(
             "Your hint request has been submitted! Hang on tight - a hint giver will be with you shortly."

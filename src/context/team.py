@@ -70,3 +70,10 @@ async def remove_member_from_team(guild: discord.Guild, member: discord.Member):
     await remove_team(team_name)
 
     return "deleted"
+
+
+async def check_if_max_hints(team_name: str):
+    team = await get_team(team_name)
+
+    # check if top 3 has been taken
+    # unlimited hints if so and we just return False
