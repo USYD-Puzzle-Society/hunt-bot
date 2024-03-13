@@ -1,6 +1,6 @@
 from typing import List
 import psycopg
-from psycopg.rows import class_row
+from psycopg.rows import class_row, dict_row
 
 from src.config import config
 from src.models.puzzle import Puzzle
@@ -128,3 +128,26 @@ async def delete_puzzle(puzzle_id: str):
     await aconn.close()
 
     return True
+
+
+async def get_leaderboard() -> tuple[str, int]:
+    aconn = await psycopg.AsyncConnection.connect(DATABASE_URL)
+    acur = aconn.cursor()
+
+    await acur.execute(
+        """
+        SELECT t.team_name, t.puzzle_solved
+        FROM public.teams AS t LEFT JOIN public.submissions AS s
+        ON (t.team_name = s.team_name)
+        AND s.submission_is_correct = TRUE
+        GROUP BY t.team_name
+        ORDER BY t.puzzle_solved DESC, MAX(s.submission_time) ASC, t.team_name ASC
+        """
+    )
+
+    leaderboard = await acur.fetchall()
+
+    await acur.close()
+    await aconn.close()
+
+    return leaderboard
