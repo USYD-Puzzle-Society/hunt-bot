@@ -21,6 +21,7 @@ CREATE TABLE public.teams (
     text_channel_id text NOT NULL,
     team_role_id text NOT NULL,
     puzzle_solved integer NOT NULL default 0
+    hints_used integer NOT NULL default 0
 );
 
 CREATE TABLE public.players (
