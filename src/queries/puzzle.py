@@ -141,7 +141,7 @@ async def get_leaderboard() -> tuple[str, int]:
         ON (t.team_name = s.team_name)
         AND s.submission_is_correct = TRUE
         GROUP BY t.team_name
-        ORDER BY t.puzzle_solved DESC, MAX(s.submission_time) ASC
+        ORDER BY t.puzzle_solved DESC, MAX(s.submission_time) ASC, t.team_name ASC
         """
     )
 
