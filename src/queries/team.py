@@ -112,25 +112,13 @@ async def increase_puzzles_solved(team_name: str):
     if not await get_team(team_name):
         return False
 
-    # get the current number of solved puzzles by the team
-    await acur.execute(
-        """
-        SELECT t.puzzle_solved
-        FROM public.teams AS t
-        WHERE t.team_name = %s
-        """,
-        (team_name,),
-    )
-
-    puzzles_solved = (await acur.fetchone())[0]
-
     await acur.execute(
         """
         UPDATE public.teams
-        SET puzzle_solved = %s
+        SET puzzle_solved = puzzle_solved + 1
         WHERE team_name = %s
         """,
-        (puzzles_solved + 1, team_name),
+        (team_name,),
     )
 
     await aconn.commit()
