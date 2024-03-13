@@ -63,9 +63,6 @@ class Puzzle(commands.GroupCog):
     def __init__(self, bot):
         self.bot = bot
 
-    def update_leaderboard(self, new_embeds: list[discord.Embed]):
-        self.leaderboard_embeds = new_embeds
-
     @app_commands.command(name="submit", description="Submit an answer to a puzzle")
     @in_team_channel
     async def submit_answer(
@@ -106,8 +103,8 @@ class Puzzle(commands.GroupCog):
 
         if not submission_is_correct:
             return await interaction.followup.send("The submitted answer is incorrect!")
-        else:
-            await increase_puzzles_solved(player.team_name)
+
+        await increase_puzzles_solved(player.team_name)
 
         # check if they have solved all the metas
         if puzzle_id == "UTS-M":
