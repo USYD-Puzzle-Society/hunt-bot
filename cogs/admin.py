@@ -220,12 +220,13 @@ class Admin(commands.GroupCog):
     )
     @commands.has_role(EXEC_ID)
     async def add_member(
-        self,
-        interaction: discord.Interaction,
-        member: discord.Member,
-        team_name: str,
+        self, interaction: discord.Interaction, member: discord.Member
     ):
         await interaction.response.defer(ephemeral=True)
+
+        category = interaction.channel.category
+        vc = category.voice_channels[0]
+        team_name = vc.name
 
         guild = interaction.guild
 
@@ -239,7 +240,8 @@ class Admin(commands.GroupCog):
         team = await get_team(team_name)
         if not team:
             await interaction.followup.send(
-                f"{team_name} does not exist. Did you type the name correctly?",
+                f"This channel does not belong to a team. "
+                + "Did you type the command in the correct channel?",
                 ephemeral=True,
             )
             return
@@ -258,19 +260,6 @@ class Admin(commands.GroupCog):
         await interaction.followup.send(
             f"{member.display_name} is now part of the {team_name}!", ephemeral=True
         )
-
-    @app_commands.command(
-        name="get_team_name",
-        description="Gets the team name of the current channel you're in.",
-    )
-    @commands.has_role(EXEC_ID)
-    async def get_team_name(self, interaction: discord.Interaction):
-        await interaction.response.defer(ephemeral=True)
-
-        category = interaction.channel.category
-        vc = category.voice_channels[0]
-
-        await interaction.followup.send(vc.name)
 
 
 async def setup(bot: commands.Bot):
