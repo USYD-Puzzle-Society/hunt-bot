@@ -3,6 +3,7 @@ import discord
 from typing import List
 
 from src.queries.player import get_player, remove_player
+from queries.puzzle import get_finished_teams
 from src.queries.team import get_team, get_team_members, remove_team
 
 from src.models.player import Player
@@ -77,3 +78,4 @@ async def check_if_max_hints(team_name: str):
 
     # check if top 3 has been taken
     # unlimited hints if so and we just return False
+    finished_teams = await get_finished_teams()
