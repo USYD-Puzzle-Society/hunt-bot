@@ -82,7 +82,7 @@ async def remove_member_from_team(guild: discord.Guild, member: discord.Member):
 
 
 def get_max_hints():
-    now = datetime.now(tz=ZoneInfo("Australia/Sydney"))
+    now = datetime.now(tz=ZoneInfo("Australia/Sydney")) + timedelta(hours=1)
     start = config["HUNT_START_TIME"]
 
     if now < start:
@@ -116,8 +116,8 @@ async def check_if_max_hints(team_name: str):
 
 
 def get_next_hint_time() -> str:
-    now = datetime.now(tz=ZoneInfo("Australia/Sydney"))
-    start = config["HUNT_START_TIME"] + timedelta(hours=1)
+    now = datetime.now(tz=ZoneInfo("Australia/Sydney")) + timedelta(hours=1)
+    start = config["HUNT_START_TIME"]
 
     if now < start:
         return "10:15 16th of March"
