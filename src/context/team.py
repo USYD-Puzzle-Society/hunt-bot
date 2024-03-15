@@ -117,7 +117,7 @@ async def check_if_max_hints(team_name: str):
 
 def get_next_hint_time() -> str:
     now = datetime.now(tz=ZoneInfo("Australia/Sydney"))
-    start = config["HUNT_START_TIME"]
+    start = config["HUNT_START_TIME"] + timedelta(hours=1)
 
     if now < start:
         return "10:15 16th of March"
