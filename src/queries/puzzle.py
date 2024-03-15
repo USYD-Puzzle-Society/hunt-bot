@@ -4,6 +4,7 @@ from psycopg.rows import class_row, dict_row
 
 from src.config import config
 from src.models.puzzle import Puzzle
+from src.models.team import Team
 
 DATABASE_URL = config["DATABASE_URL"]
 
@@ -151,3 +152,24 @@ async def get_leaderboard() -> tuple[str, int]:
     await aconn.close()
 
     return leaderboard
+
+
+async def get_finished_teams():
+    aconn = await psycopg.AsyncConnection.connect(DATABASE_URL)
+    acur = aconn.cursor()
+
+    await acur.execute(
+        """
+        SELECT t.team_name
+        FROM public.teams AS t JOIN public.submissions AS s
+        ON (t.team_name = s.team_name)
+        WHERE s.puzzle_id = 'METAMETA' AND s.submission_is_correct = TRUE
+        """
+    )
+
+    finished_teams = await acur.fetchall()
+
+    await acur.close()
+    await aconn.close()
+
+    return finished_teams

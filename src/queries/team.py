@@ -124,3 +124,24 @@ async def increase_puzzles_solved(team_name: str):
     await aconn.commit()
     await acur.close()
     await aconn.close()
+
+
+async def increase_hints_used(team_name: str):
+    aconn = await psycopg.AsyncConnection.connect(DATABASE_URL)
+    acur = aconn.cursor()
+
+    if not await get_team(team_name):
+        return False
+
+    await acur.execute(
+        """
+        UPDATE public.teams
+        SET hints_used = hints_used + 1
+        WHERE team_name = %s
+        """,
+        (team_name,),
+    )
+
+    await aconn.commit()
+    await acur.close()
+    await aconn.close()

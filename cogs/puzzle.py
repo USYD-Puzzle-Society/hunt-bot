@@ -7,16 +7,23 @@ from discord.ext import commands
 from discord import app_commands
 from discord.ui import View, view, Button, button
 
-from src.queries.puzzle import get_puzzle, get_completed_puzzles, get_leaderboard
+from src.queries.puzzle import get_puzzle, get_leaderboard
 from src.queries.submission import (
     create_submission,
     find_submissions_by_discord_id_and_puzzle_id,
 )
 from src.queries.player import get_player
-from src.queries.team import get_team, get_team_members, increase_puzzles_solved
+from src.queries.team import (
+    get_team,
+    get_team_members,
+    increase_puzzles_solved,
+    increase_hints_used,
+)
 
 from src.utils.decorators import in_team_channel
 from src.context.puzzle import can_access_puzzle, get_accessible_puzzles
+from src.context.team import check_if_max_hints, get_next_hint_time
+
 
 EXEC_ID = config["EXEC_ID"]
 
@@ -134,8 +141,15 @@ class Puzzle(commands.GroupCog):
 
         elif puzzle_id == "METAMETA":
             team = await get_team(player.team_name)
+
+            victory_embed = discord.Embed(
+                colour=discord.Color.gold(),
+                title=f"Team <#{team.text_channel_id}> has finished the hunt!",
+                description=f"Congratulate them over in the <#{config['VICTOR_TEXT_CHANNEL_ID']}>",
+            )
+
             await interaction.client.get_channel(config["ADMIN_CHANNEL_ID"]).send(
-                f"Team <#{team.text_channel_id}> has finished all the puzzles!"
+                embed=victory_embed
             )
 
             # give team the victor role
@@ -185,14 +199,47 @@ class Puzzle(commands.GroupCog):
         embed.add_field(name="Puzzles", value="\n".join(puzzle_name_links), inline=True)
         await interaction.followup.send(embed=embed)
 
-    @app_commands.command(name="hint", description="Request a hint for the puzzle!")
+    @app_commands.command(
+        name="hint",
+        description="Request a hint for the puzzle! Please be detailed about what you're stuck on.",
+    )
     @in_team_channel
-    async def hint(self, interaction: discord.Interaction):
+    async def hint(
+        self, interaction: discord.Interaction, puzzle_name: str, hint_msg: str
+    ):
         await interaction.response.defer()
-        team = await get_player(interaction.user.id)
-        await interaction.client.get_channel(config["ADMIN_CHANNEL_ID"]).send(
-            f"Hint request submitted from team {team.team_name}! {interaction.channel.mention}"
+
+        if datetime.now(tz=ZoneInfo("Australia/Sydney")) < config["HUNT_START_TIME"]:
+            await interaction.followup.send("The hunt has not started yet :pensive:")
+            return
+
+        player = await get_player(interaction.user.id)
+
+        max_hints = await check_if_max_hints(player.team_name)
+        if max_hints:
+            next_hint_time = get_next_hint_time()
+            await interaction.followup.send(
+                "You have used up all your available hints! "
+                + f"Next hint at {next_hint_time}. A new hint is available every hour."
+            )
+
+            return
+
+        await increase_hints_used(player.team_name)
+
+        hint_embed = discord.Embed(
+            colour=discord.Color.dark_teal(),
+            title=f"Hint Request From {interaction.channel.mention}",
+            description=f"**Puzzle Name:** {puzzle_name}",
         )
+
+        if hint_msg:
+            hint_embed.add_field(name="Details", value=hint_msg)
+
+        await interaction.client.get_channel(config["ADMIN_CHANNEL_ID"]).send(
+            embed=hint_embed
+        )
+
         await interaction.followup.send(
             "Your hint request has been submitted! Hang on tight - a hint giver will be with you shortly."
         )
