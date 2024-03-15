@@ -185,9 +185,14 @@ class Puzzle(commands.GroupCog):
         embed.add_field(name="Puzzles", value="\n".join(puzzle_name_links), inline=True)
         await interaction.followup.send(embed=embed)
 
-    @app_commands.command(name="hint", description="Request a hint for the puzzle!")
+    @app_commands.command(
+        name="hint",
+        description="Request a hint for the puzzle! Please be detailed about what you're stuck on.",
+    )
     @in_team_channel
-    async def hint(self, interaction: discord.Interaction):
+    async def hint(
+        self, interaction: discord.Interaction, puzzle_name: str, hint_msg: str
+    ):
         await interaction.response.defer()
 
         if datetime.now(tz=ZoneInfo("Australia/Sydney")) < config["HUNT_START_TIME"]:
@@ -208,9 +213,19 @@ class Puzzle(commands.GroupCog):
 
         await increase_hints_used(player.team_name)
 
-        await interaction.client.get_channel(config["ADMIN_CHANNEL_ID"]).send(
-            f"Hint request submitted from team {player.team_name}! {interaction.channel.mention}"
+        hint_embed = discord.Embed(
+            colour=discord.Color.dark_teal(),
+            title=f"Hint Request From {interaction.channel.mention}",
+            description=f"**Puzzle Name:** {puzzle_name}",
         )
+
+        if hint_msg:
+            hint_embed.add_field(name="Details", value=hint_msg)
+
+        await interaction.client.get_channel(config["ADMIN_CHANNEL_ID"]).send(
+            embed=hint_embed
+        )
+
         await interaction.followup.send(
             "Your hint request has been submitted! Hang on tight - a hint giver will be with you shortly."
         )
