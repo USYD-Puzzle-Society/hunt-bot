@@ -3,10 +3,17 @@ import discord
 from typing import List
 
 from src.queries.player import get_player, remove_player
-from queries.puzzle import get_finished_teams
+from src.queries.puzzle import get_finished_teams
 from src.queries.team import get_team, get_team_members, remove_team
 
 from src.models.player import Player
+
+from src.config import config
+
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+
+SECONDS_IN_AN_HOUR = 3600
 
 
 async def get_team_channels(guild: discord.Guild, team_name: str):
@@ -79,3 +86,29 @@ async def check_if_max_hints(team_name: str):
     # check if top 3 has been taken
     # unlimited hints if so and we just return False
     finished_teams = await get_finished_teams()
+    if len(finished_teams) >= 3:
+        return False
+
+    # check how many hints would be available
+    # if no hints were used
+    # hints are given out 1 per hour
+    # so total number of hints that would be available
+    # is the same as the number of hours that have passed
+    time_difference = (
+        datetime.now(tz=ZoneInfo("Australia/Sydney")) - config["HUNT_START_TIME"]
+    )
+    total_hints = time_difference.seconds // SECONDS_IN_AN_HOUR
+    if team.hints_used < total_hints:
+        return False
+
+    return True
+
+
+async def get_next_hint_time() -> str:
+    time_difference = (
+        datetime.now(tz=ZoneInfo("Australia/Sydney")) - config["HUNT_START_TIME"]
+    )
+    hours_passed = time_difference.seconds // SECONDS_IN_AN_HOUR
+
+    next_hint_time = config["HUNT_START_TIME"] + timedelta(hours=hours_passed + 1)
+    return next_hint_time.strftime("%H:%M")
