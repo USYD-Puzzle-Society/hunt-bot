@@ -134,8 +134,15 @@ class Puzzle(commands.GroupCog):
 
         elif puzzle_id == "METAMETA":
             team = await get_team(player.team_name)
+
+            victory_embed = discord.Embed(
+                colour=discord.Color.gold(),
+                title=f"Team <#{team.text_channel_id}> has finished the hunt!",
+                description=f"Congratulate them over in the <#{config['VICTOR_TEXT_CHANNEL_ID']}>",
+            )
+
             await interaction.client.get_channel(config["ADMIN_CHANNEL_ID"]).send(
-                f"Team <#{team.text_channel_id}> has finished all the puzzles!"
+                embed=victory_embed
             )
 
             # give team the victor role
