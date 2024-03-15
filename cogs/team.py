@@ -9,7 +9,7 @@ import src.queries.player as player_query
 from src.config import config
 
 from src.context.puzzle import get_accessible_puzzles
-from src.context.team import remove_member_from_team
+from src.context.team import remove_member_from_team, get_max_hints, get_next_hint_time
 
 from src.utils.decorators import in_team_channel
 
@@ -255,6 +255,14 @@ class Team(commands.GroupCog):
             name="Puzzle Status",
             value=f"You have solved {team.puzzle_solved} puzzles "
             + f"out of {len(accessible_puzzles)} available!",
+        )
+
+        max_hints = await get_max_hints()
+        next_hint_time = await get_next_hint_time()
+        info_embed.add_field(
+            name="Hint Status",
+            value=f"You have used {team.hints_used} out of {max_hints} available. "
+            + f"Next hint at {next_hint_time}.",
         )
 
         await interaction.followup.send(embed=info_embed)
