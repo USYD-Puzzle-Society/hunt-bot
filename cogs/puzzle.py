@@ -22,6 +22,8 @@ from src.queries.team import (
 
 from src.utils.decorators import in_team_channel
 from src.context.puzzle import can_access_puzzle, get_accessible_puzzles
+from src.context.team import check_if_max_hints, get_next_hint_time
+
 
 EXEC_ID = config["EXEC_ID"]
 
@@ -188,9 +190,21 @@ class Puzzle(commands.GroupCog):
     async def hint(self, interaction: discord.Interaction):
         await interaction.response.defer()
 
+        if datetime.now(tz=ZoneInfo("Australia/Sydney")) < config["HUNT_START_TIME"]:
+            await interaction.followup.send("The hunt has not started yet :pensive:")
+            return
+
         player = await get_player(interaction.user.id)
 
-        await check_if_max_hints(player.team_name)
+        max_hints = await check_if_max_hints(player.team_name)
+        if max_hints:
+            next_hint_time = await get_next_hint_time()
+            await interaction.followup.send(
+                "You have used up all your available hints! "
+                + f"Next hint at {next_hint_time}. A new hint is available every hour."
+            )
+
+            return
 
         await increase_hints_used(player.team_name)
 
