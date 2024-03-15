@@ -8,3 +8,4 @@ class Team(BaseModel):
     text_channel_id: int
     team_role_id: int
     puzzle_solved: int
+    hints_used: int
