@@ -66,8 +66,17 @@ async def can_access_puzzle(puzzle: Puzzle, team_name: str) -> bool:
 async def get_accessible_puzzles(team_name: str) -> List[Puzzle]:
     puzzles = await get_puzzles()
     completed_puzzles = await get_completed_puzzles(team_name)
-    return [
-        puzzle
-        for puzzle in puzzles
-        if can_access_puzzle_context(puzzle, completed_puzzles)
-    ]
+    return sorted(
+        [
+            puzzle
+            for puzzle in puzzles
+            if can_access_puzzle_context(puzzle, completed_puzzles)
+        ],
+        key=lambda p: (
+            p.uni != "UTS",
+            p.uni != "USYD",
+            p.uni != "UNSW",
+            p.uni != "METAMETA",
+            p.puzzle_name,
+        ),
+    )
