@@ -76,6 +76,7 @@ class Puzzle(commands.GroupCog):
         self, interaction: discord.Interaction, puzzle_id: str, answer: str
     ):
         await interaction.response.defer()
+        answer = answer.lower()
 
         if datetime.now(tz=ZoneInfo("Australia/Sydney")) < HUNT_START_TIME:
             return await interaction.followup.send(
