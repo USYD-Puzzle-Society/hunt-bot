@@ -7,7 +7,7 @@ from discord.ext import commands
 from discord import app_commands
 from discord.ui import View, view, Button, button
 
-from src.queries.puzzle import get_puzzle, get_leaderboard
+from src.queries.puzzle import get_puzzle, get_completed_puzzles, get_leaderboard
 from src.queries.submission import (
     create_submission,
     find_submissions_by_discord_id_and_puzzle_id,
@@ -76,6 +76,7 @@ class Puzzle(commands.GroupCog):
         self, interaction: discord.Interaction, puzzle_id: str, answer: str
     ):
         await interaction.response.defer()
+        answer = answer.lower()
 
         if datetime.now(tz=ZoneInfo("Australia/Sydney")) < HUNT_START_TIME:
             return await interaction.followup.send(
