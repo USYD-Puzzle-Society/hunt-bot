@@ -227,19 +227,29 @@ class Puzzle(commands.GroupCog):
             )
             for _ in range(num_embeds)
         ]
-        leaderboard_text = [("", "") for _ in range(num_embeds)]
+        leaderboard_text = [("", "", "") for _ in range(num_embeds)]
         for i, val in enumerate(leaderboard_values):
-            team_name, puzzles_solved = val
-
-            team_str, puzzles_solved_str = leaderboard_text[i // TEAMS_PER_EMBED]
+            team_name, puzzles_solved, submission_time = val
+            print(leaderboard_text[i // TEAMS_PER_EMBED])
+            team_str, puzzles_solved_str, submission_time_str = leaderboard_text[
+                i // TEAMS_PER_EMBED
+            ]
             team_str += f"{i+1}. {team_name}\n"
             puzzles_solved_str += f"{puzzles_solved}\n"
+            submission_time_str += f"{submission_time.strftime('%d/%m %X') if submission_time else 'N/A'}\n"
 
-            leaderboard_text[i // TEAMS_PER_EMBED] = (team_str, puzzles_solved_str)
+            leaderboard_text[i // TEAMS_PER_EMBED] = (
+                team_str,
+                puzzles_solved_str,
+                submission_time_str,
+            )
 
         for page_num, embed in enumerate(leaderboard_embeds):
             embed.add_field(name="Team", value=leaderboard_text[page_num][0])
             embed.add_field(name="Puzzles Solved", value=leaderboard_text[page_num][1])
+            embed.add_field(
+                name="Last Submission Time", value=leaderboard_text[page_num][2]
+            )
 
         await interaction.followup.send(
             embed=leaderboard_embeds[0], view=PaginationView(leaderboard_embeds)

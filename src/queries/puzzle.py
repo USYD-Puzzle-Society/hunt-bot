@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 import psycopg
 from psycopg.rows import class_row, dict_row
@@ -130,13 +131,13 @@ async def delete_puzzle(puzzle_id: str):
     return True
 
 
-async def get_leaderboard() -> tuple[str, int]:
+async def get_leaderboard() -> List[tuple[str, int, datetime | None]]:
     aconn = await psycopg.AsyncConnection.connect(DATABASE_URL)
     acur = aconn.cursor()
-
+    await acur.execute("SET TIMEZONE to 'Australia/Sydney'")
     await acur.execute(
         """
-        SELECT t.team_name, t.puzzle_solved
+        SELECT t.team_name, t.puzzle_solved, MAX(s.submission_time)
         FROM public.teams AS t LEFT JOIN public.submissions AS s
         ON (t.team_name = s.team_name)
         AND s.submission_is_correct = TRUE
