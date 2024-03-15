@@ -169,6 +169,7 @@ class Puzzle(commands.GroupCog):
 
         puzzle_ids = []
         puzzle_name_links = []
+        puzzle_answers = []
         for puzzle in puzzles:
             submissions = await find_submissions_by_discord_id_and_puzzle_id(
                 player.discord_id, puzzle.puzzle_id
@@ -176,13 +177,16 @@ class Puzzle(commands.GroupCog):
 
             if any([submission.submission_is_correct for submission in submissions]):
                 puzzle_ids.append(f":white_check_mark: {puzzle.puzzle_id}")
+                puzzle_answers.append(f"{puzzle.puzzle_answer}")
             else:
                 puzzle_ids.append(puzzle.puzzle_id)
+                puzzle_answers.append("?")
 
             puzzle_name_links.append(f"[{puzzle.puzzle_name}]({puzzle.puzzle_link})")
 
         embed.add_field(name="ID", value="\n".join(puzzle_ids), inline=True)
         embed.add_field(name="Puzzles", value="\n".join(puzzle_name_links), inline=True)
+        embed.add_field(name="Answers", value="\n".join(puzzle_answers), inline=True)
         await interaction.followup.send(embed=embed)
 
     @app_commands.command(name="hint", description="Request a hint for the puzzle!")
