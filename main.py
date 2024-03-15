@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from src.config import config
 import os
+import sentry_sdk
 
 EXEC_ID = config["EXEC_ID"]
 COGS_DIR = "cogs"
@@ -20,6 +21,10 @@ async def load_cogs():
 
 @bot.event
 async def on_ready():
+    sentry_sdk.init(
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
     await load_cogs()
     await bot.tree.sync()
     print(f"Connected as {bot.user}.")
