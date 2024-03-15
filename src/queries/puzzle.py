@@ -163,7 +163,7 @@ async def get_finished_teams():
         SELECT t.team_name
         FROM public.teams AS t JOIN public.submissions AS s
         ON (t.team_name = s.team_name)
-        WHERE s.puzzle_id = METAMETA AND s.submission_is_correct = TRUE
+        WHERE s.puzzle_id = 'METAMETA' AND s.submission_is_correct = TRUE
         """
     )
 
