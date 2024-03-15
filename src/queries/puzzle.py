@@ -156,7 +156,7 @@ async def get_leaderboard() -> tuple[str, int]:
 
 async def get_finished_teams():
     aconn = await psycopg.AsyncConnection.connect(DATABASE_URL)
-    acur = aconn.cursor(row_factory=class_row(Team))
+    acur = aconn.cursor()
 
     await acur.execute(
         """
