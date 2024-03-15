@@ -7,7 +7,7 @@ from discord.ext import commands
 from discord import app_commands
 from discord.ui import View, view, Button, button
 
-from src.queries.puzzle import get_puzzle, get_leaderboard
+from src.queries.puzzle import get_puzzle, get_completed_puzzles, get_leaderboard
 from src.queries.submission import (
     create_submission,
     find_submissions_by_discord_id_and_puzzle_id,
