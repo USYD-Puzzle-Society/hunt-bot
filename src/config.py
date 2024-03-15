@@ -13,7 +13,7 @@ config: dict[str, str | int | datetime] = {
     "VICTOR_TEXT_CHANNEL_ID": int(os.environ["VICTOR_TEXT_CHANNEL_ID"]),
     "EXEC_ID": "Executives",
     "HUNT_START_TIME": datetime(
-        2024, 3, 16, 9, 15, tzinfo=ZoneInfo("Australia/Sydney")
+        2024, 3, 16, 3, 15, tzinfo=ZoneInfo("Australia/Sydney")
     ),
-    "ANTIPUZZLER_ID": 1212404432252313641,
+    "VV_ROLE_ID": 1217654330912411659,
 }
