@@ -89,12 +89,12 @@ def get_max_hints():
     return max_hints
 
 
-def check_if_max_hints(team_name: str):
-    team = get_team(team_name)
+async def check_if_max_hints(team_name: str):
+    team = await get_team(team_name)
 
     # check if top 3 has been taken
     # unlimited hints if so and we just return False
-    finished_teams = get_finished_teams()
+    finished_teams = await get_finished_teams()
     if len(finished_teams) >= 3:
         return False
 
@@ -110,7 +110,7 @@ def check_if_max_hints(team_name: str):
     return True
 
 
-async def get_next_hint_time() -> str:
+def get_next_hint_time() -> str:
     time_difference = (
         datetime.now(tz=ZoneInfo("Australia/Sydney")) - config["HUNT_START_TIME"]
     )

@@ -203,7 +203,7 @@ class Puzzle(commands.GroupCog):
 
         max_hints = await check_if_max_hints(player.team_name)
         if max_hints:
-            next_hint_time = await get_next_hint_time()
+            next_hint_time = get_next_hint_time()
             await interaction.followup.send(
                 "You have used up all your available hints! "
                 + f"Next hint at {next_hint_time}. A new hint is available every hour."
