@@ -151,7 +151,29 @@ class Puzzle(commands.GroupCog):
             )
             return
 
-        await interaction.followup.send("The submitted answer is ...CORRECT!")
+        completed_puzzles = await get_completed_puzzles(player.team_name)
+        # we must have submitted a puzzle correctly at this point
+        # if so, we can check if the number of puzzles completed is
+        # UTS - 4, USYD - 11 (4 + 1 + 6), UNSW - 16 (4 + 1 + 6 + 1 + 4), or METAMETA - 17 (4 + 1 + 6 + 1 + 4 + 1) respectively
+        num_of_puzzles_completed = len(completed_puzzles)
+        if num_of_puzzles_completed == 4:
+            await interaction.followup.send(
+                "The submitted answer is ...CORRECT! The meta for UTS is now unlocked!"
+            )
+        elif num_of_puzzles_completed == 11:
+            await interaction.followup.send(
+                "The submitted answer is ...CORRECT! The meta for USYD is now unlocked!"
+            )
+        elif num_of_puzzles_completed == 16:
+            await interaction.followup.send(
+                "The submitted answer is ...CORRECT! The meta for UNSW is now unlocked!"
+            )
+        elif num_of_puzzles_completed == 17:
+            await interaction.followup.send(
+                "The submitted answer is ...CORRECT! The metameta is now unlocked!"
+            )
+        else:
+            await interaction.followup.send("The submitted answer is ...CORRECT!")
 
     @app_commands.command(name="list", description="List the available puzzles")
     @in_team_channel
