@@ -13,6 +13,7 @@ from src.config import config
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
+SECONDS_BETWEEN_HINTS = 7200  # how many seconds between each new hint
 SECONDS_IN_AN_HOUR = 3600
 
 
@@ -84,7 +85,7 @@ def get_max_hints():
     time_difference = (
         datetime.now(tz=ZoneInfo("Australia/Sydney")) - config["HUNT_START_TIME"]
     )
-    max_hints = time_difference.seconds // SECONDS_IN_AN_HOUR
+    max_hints = time_difference.seconds // SECONDS_BETWEEN_HINTS
 
     return max_hints
 
@@ -114,7 +115,9 @@ def get_next_hint_time() -> str:
     time_difference = (
         datetime.now(tz=ZoneInfo("Australia/Sydney")) - config["HUNT_START_TIME"]
     )
-    hours_passed = time_difference.seconds // SECONDS_IN_AN_HOUR
+    hours_passed = time_difference.seconds // SECONDS_BETWEEN_HINTS
 
-    next_hint_time = config["HUNT_START_TIME"] + timedelta(hours=hours_passed + 1)
+    next_hint_time = config["HUNT_START_TIME"] + timedelta(
+        hours=hours_passed + (SECONDS_BETWEEN_HINTS // SECONDS_IN_AN_HOUR)
+    )
     return next_hint_time.strftime("%H:%M")
