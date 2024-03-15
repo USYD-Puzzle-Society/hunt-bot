@@ -80,6 +80,15 @@ async def remove_member_from_team(guild: discord.Guild, member: discord.Member):
     return "deleted"
 
 
+async def get_max_hints():
+    time_difference = (
+        datetime.now(tz=ZoneInfo("Australia/Sydney")) - config["HUNT_START_TIME"]
+    )
+    max_hints = time_difference.seconds // SECONDS_IN_AN_HOUR
+
+    return max_hints
+
+
 async def check_if_max_hints(team_name: str):
     team = await get_team(team_name)
 
@@ -94,10 +103,7 @@ async def check_if_max_hints(team_name: str):
     # hints are given out 1 per hour
     # so total number of hints that would be available
     # is the same as the number of hours that have passed
-    time_difference = (
-        datetime.now(tz=ZoneInfo("Australia/Sydney")) - config["HUNT_START_TIME"]
-    )
-    total_hints = time_difference.seconds // SECONDS_IN_AN_HOUR
+    total_hints = await get_max_hints()
     if team.hints_used < total_hints:
         return False
 
