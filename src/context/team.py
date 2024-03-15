@@ -89,7 +89,7 @@ def get_max_hints():
         return 0
 
     time_difference = now - start
-    max_hints = time_difference.seconds // SECONDS_BETWEEN_HINTS + 1
+    max_hints = time_difference.seconds // SECONDS_BETWEEN_HINTS
 
     return max_hints
 
