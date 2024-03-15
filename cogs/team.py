@@ -263,7 +263,7 @@ class Team(commands.GroupCog):
         )
 
         finished_teams = await get_finished_teams()
-        if len(finished_teams) >= 1:
+        if len(finished_teams) >= 3:
             info_embed.add_field(
                 name="Hint Status",
                 value=f"Hints are now unlimited! You have used {team.hints_used} hints.",
