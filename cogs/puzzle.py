@@ -165,7 +165,25 @@ class Puzzle(commands.GroupCog):
             )
             return
 
-        await interaction.followup.send("The submitted answer is ...CORRECT!")
+        completed_puzzles = await get_completed_puzzles(player.team_name)
+        # we must have submitted a puzzle correctly at this point
+        # if so, we can check if the number of puzzles completed is
+        # UTS - 4, USYD - 11 (4 + 1 + 6), or UNSW - 16 (4 + 1 + 6 + 1 + 4) respectively
+        num_of_puzzles_completed = len(completed_puzzles)
+        if num_of_puzzles_completed == 4:
+            await interaction.followup.send(
+                "The submitted answer is ...CORRECT! The meta for UTS is now unlocked!"
+            )
+        elif num_of_puzzles_completed == 11:
+            await interaction.followup.send(
+                "The submitted answer is ...CORRECT! The meta for USYD is now unlocked!"
+            )
+        elif num_of_puzzles_completed == 16:
+            await interaction.followup.send(
+                "The submitted answer is ...CORRECT! The meta for UNSW is now unlocked!"
+            )
+        else:
+            await interaction.followup.send("The submitted answer is ...CORRECT!")
 
     @app_commands.command(name="list", description="List the available puzzles")
     @in_team_channel
@@ -183,6 +201,7 @@ class Puzzle(commands.GroupCog):
 
         puzzle_ids = []
         puzzle_name_links = []
+        puzzle_answers = []
         for puzzle in puzzles:
             submissions = await find_submissions_by_discord_id_and_puzzle_id(
                 player.discord_id, puzzle.puzzle_id
@@ -190,13 +209,16 @@ class Puzzle(commands.GroupCog):
 
             if any([submission.submission_is_correct for submission in submissions]):
                 puzzle_ids.append(f":white_check_mark: {puzzle.puzzle_id}")
+                puzzle_answers.append(f"{puzzle.puzzle_answer}")
             else:
                 puzzle_ids.append(puzzle.puzzle_id)
+                puzzle_answers.append("?")
 
             puzzle_name_links.append(f"[{puzzle.puzzle_name}]({puzzle.puzzle_link})")
 
         embed.add_field(name="ID", value="\n".join(puzzle_ids), inline=True)
         embed.add_field(name="Puzzles", value="\n".join(puzzle_name_links), inline=True)
+        embed.add_field(name="Answers", value="\n".join(puzzle_answers), inline=True)
         await interaction.followup.send(embed=embed)
 
     @app_commands.command(
@@ -274,19 +296,29 @@ class Puzzle(commands.GroupCog):
             )
             for _ in range(num_embeds)
         ]
-        leaderboard_text = [("", "") for _ in range(num_embeds)]
+        leaderboard_text = [("", "", "") for _ in range(num_embeds)]
         for i, val in enumerate(leaderboard_values):
-            team_name, puzzles_solved = val
-
-            team_str, puzzles_solved_str = leaderboard_text[i // TEAMS_PER_EMBED]
+            team_name, puzzles_solved, submission_time = val
+            print(leaderboard_text[i // TEAMS_PER_EMBED])
+            team_str, puzzles_solved_str, submission_time_str = leaderboard_text[
+                i // TEAMS_PER_EMBED
+            ]
             team_str += f"{i+1}. {team_name}\n"
             puzzles_solved_str += f"{puzzles_solved}\n"
+            submission_time_str += f"{submission_time.strftime('%d/%m %X') if submission_time else 'N/A'}\n"
 
-            leaderboard_text[i // TEAMS_PER_EMBED] = (team_str, puzzles_solved_str)
+            leaderboard_text[i // TEAMS_PER_EMBED] = (
+                team_str,
+                puzzles_solved_str,
+                submission_time_str,
+            )
 
         for page_num, embed in enumerate(leaderboard_embeds):
             embed.add_field(name="Team", value=leaderboard_text[page_num][0])
             embed.add_field(name="Puzzles Solved", value=leaderboard_text[page_num][1])
+            embed.add_field(
+                name="Last Submission Time", value=leaderboard_text[page_num][2]
+            )
 
         await interaction.followup.send(
             embed=leaderboard_embeds[0], view=PaginationView(leaderboard_embeds)
