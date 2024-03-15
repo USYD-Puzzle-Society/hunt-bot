@@ -122,8 +122,12 @@ class Puzzle(commands.GroupCog):
             # the following is part of an exec's puzzle
             guild = interaction.guild
             team = await get_team(player.team_name)
-            antipuzzler = guild.get_member(config["ANTIPUZZLER_ID"])
-            await antipuzzler.add_roles(guild.get_role(team.team_role_id))
+            team_members = await get_team_members(player.team_name)
+            vv_role = guild.get_role(config["VV_ROLE_ID"])
+
+            for member in team_members:
+                discord_member = guild.get_member(member.discord_id)
+                await discord_member.add_roles(vv_role)
 
             return
 
