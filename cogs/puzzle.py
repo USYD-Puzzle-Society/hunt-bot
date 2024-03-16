@@ -247,7 +247,7 @@ class Puzzle(commands.GroupCog):
             next_hint_time = get_next_hint_time()
             await interaction.followup.send(
                 "You have used up all your available hints! "
-                + f"Next hint at {next_hint_time}. A new hint is available every hour."
+                + f"Next hint at {next_hint_time}. A new hint is available every 2 hour."
             )
 
             return
