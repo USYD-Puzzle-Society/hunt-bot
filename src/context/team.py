@@ -123,9 +123,9 @@ def get_next_hint_time() -> str:
         return "10:15 16th of March"
 
     time_difference = now - start
-    hours_passed = time_difference.seconds // SECONDS_BETWEEN_HINTS
+    hints_available = time_difference.seconds // SECONDS_BETWEEN_HINTS
 
     next_hint_time = config["HUNT_START_TIME"] + timedelta(
-        hours=hours_passed + (SECONDS_BETWEEN_HINTS // SECONDS_IN_AN_HOUR)
+        hours=hints_available * 2 + (SECONDS_BETWEEN_HINTS // SECONDS_IN_AN_HOUR) - 1
     )
     return next_hint_time.strftime("%H:%M")
