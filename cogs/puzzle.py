@@ -117,7 +117,7 @@ class Puzzle(commands.GroupCog):
         # check if they have solved all the metas
         if puzzle_id == "UTS-M":
             await interaction.followup.send(
-                "With the LURES, you can now bait out the Antipuzzler for the showdown whenever you want! But, you're not quite strong enough to take them on yet, so you continue your adventure."
+                f"With the {puzzle.puzzle_answer.upper()}, you can now bait out the Antipuzzler for the showdown whenever you want! But, you're not quite strong enough to take them on yet, so you continue your adventure."
             )
 
             # the following is part of an exec's puzzle
@@ -134,13 +134,13 @@ class Puzzle(commands.GroupCog):
 
         elif puzzle_id == "USYD-M":
             await interaction.followup.send(
-                "Now equipped with a RADAR, you'll be able to scout for all resources for the fight and detect if the Antipuzzler is getting too close! But you need something else before the final showdown..."
+                f"Now equipped with a {puzzle.puzzle_answer.upper()}, you'll be able to scout for all resources for the fight and detect if the Antipuzzler is getting too close! But you need something else before the final showdown..."
             )
             return
 
         elif puzzle_id == "UNSW-M":
             await interaction.followup.send(
-                "Nobody fights alone! You'll need the help from some AIDES to take down the Antipuzzler. You are ready for the final showdown..."
+                f"Nobody fights alone! You'll need the help from some {puzzle.puzzle_answer.upper()} to take down the Antipuzzler. You are ready for the final showdown..."
             )
             return
 
