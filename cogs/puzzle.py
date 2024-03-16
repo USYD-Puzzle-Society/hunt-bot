@@ -134,7 +134,7 @@ class Puzzle(commands.GroupCog):
 
         elif puzzle_id == "USYD-M":
             await interaction.followup.send(
-                "The submitted answer is... CORRECT! You've completed all the USYD puzzles and can now see the UNSW puzzles.Now equipped with a RADAR, you'll be able to scout for all resources for the fight and detect if the Antipuzzler is getting too close! But you need something else before the final showdown..."
+                "Now equipped with a RADAR, you'll be able to scout for all resources for the fight and detect if the Antipuzzler is getting too close! But you need something else before the final showdown..."
             )
             return
 
