@@ -3,6 +3,7 @@ import psycopg
 
 from src.config import config
 from src.models.puzzle import Puzzle
+from src.models.team import Team
 
 
 DATABASE_URL = config["DATABASE_URL"]
@@ -32,6 +33,36 @@ async def seed_puzzles():
         ),
     ]
 
+    sample_teams = [
+        Team(
+            team_name="team 1",
+            category_channel_id=1,
+            voice_channel_id=1,
+            text_channel_id=1,
+            team_role_id=1,
+            puzzle_solved=1,
+            hints_used=0,
+        ),
+        Team(
+            team_name="team 2",
+            category_channel_id=1,
+            voice_channel_id=1,
+            text_channel_id=1,
+            team_role_id=1,
+            puzzle_solved=1,
+            hints_used=0,
+        ),
+        Team(
+            team_name="team aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            category_channel_id=1,
+            voice_channel_id=1,
+            text_channel_id=1,
+            team_role_id=1,
+            puzzle_solved=0,
+            hints_used=0,
+        ),
+    ]
+
     async with await psycopg.AsyncConnection.connect(DATABASE_URL) as aconn:
         async with aconn.cursor() as acur:
             for puzzle in sample_puzzles:
@@ -55,6 +86,21 @@ async def seed_puzzles():
                         puzzle.puzzle_author,
                         puzzle.puzzle_link,
                         puzzle.uni,
+                    ),
+                )
+            for team in sample_teams:
+                await acur.execute(
+                    """
+                    INSERT INTO public.teams
+                    (team_name, category_channel_id, voice_channel_id, text_channel_id, team_role_id)
+                    VALUES (%s, %s, %s, %s, %s)
+                    """,
+                    (
+                        team.team_name,
+                        team.category_channel_id,
+                        team.voice_channel_id,
+                        team.text_channel_id,
+                        team.team_role_id,
                     ),
                 )
 

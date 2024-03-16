@@ -308,7 +308,10 @@ class Puzzle(commands.GroupCog):
             team_str, puzzles_solved_str, submission_time_str = leaderboard_text[
                 i // TEAMS_PER_EMBED
             ]
-            team_str += f"{i+1}. {team_name}\n"
+            if len(team_name) > 25:
+                team_str += f"{i+1}\. {team_name[:25]}...\n"
+            else:
+                team_str += f"{i+1}\. {team_name}\n"
             puzzles_solved_str += f"{puzzles_solved}\n"
             submission_time_str += f"{submission_time.strftime('%d/%m %X') if submission_time else 'N/A'}\n"
 
