@@ -15,6 +15,7 @@ from zoneinfo import ZoneInfo
 
 SECONDS_BETWEEN_HINTS = 7200  # how many seconds between each new hint
 SECONDS_IN_AN_HOUR = 3600
+HOURS_IN_A_DAY = 24
 
 
 async def get_team_channels(guild: discord.Guild, team_name: str):
@@ -83,13 +84,13 @@ async def remove_member_from_team(guild: discord.Guild, member: discord.Member):
 
 def get_max_hints():
     now = datetime.now(tz=ZoneInfo("Australia/Sydney")) + timedelta(hours=1)
-    start = config["HUNT_START_TIME"]
+    start: datetime = config["HUNT_START_TIME"]
 
     if now < start:
         return 0
 
     time_difference = now - start
-    max_hints = time_difference.seconds // SECONDS_BETWEEN_HINTS
+    max_hints = int(time_difference.total_seconds()) // SECONDS_BETWEEN_HINTS
 
     return max_hints
 
