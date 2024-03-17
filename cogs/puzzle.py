@@ -308,10 +308,15 @@ class Puzzle(commands.GroupCog):
             team_str, puzzles_solved_str, submission_time_str = leaderboard_text[
                 i // TEAMS_PER_EMBED
             ]
-            if len(team_name) > 25:
-                team_str += f"{i+1}\. {team_name[:25]}...\n"
+            team_name_truncated = (
+                f"{team_name[:25]}..." if len(team_name) > 25 else team_name
+            )
+
+            if puzzles_solved == 18:  # magic number i know
+                team_str += f"{i+1}\. :partying_face: **{team_name_truncated}**\n"
             else:
-                team_str += f"{i+1}\. {team_name}\n"
+                team_str += f"{i+1}\. {team_name_truncated}\n"
+
             puzzles_solved_str += f"{puzzles_solved}\n"
             submission_time_str += f"{submission_time.strftime('%d/%m %X') if submission_time else 'N/A'}\n"
 
