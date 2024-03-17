@@ -77,6 +77,6 @@ async def get_accessible_puzzles(team_name: str) -> List[Puzzle]:
             p.uni != "USYD",
             p.uni != "UNSW",
             p.uni != "METAMETA",
-            p.puzzle_name,
+            p.puzzle_id,
         ),
     )
