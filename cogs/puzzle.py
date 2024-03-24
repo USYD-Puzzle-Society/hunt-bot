@@ -7,7 +7,12 @@ from discord.ext import commands
 from discord import app_commands
 from discord.ui import View, view, Button, button
 
-from src.queries.puzzle import get_puzzle, get_completed_puzzles, get_leaderboard
+from src.queries.puzzle import (
+    get_puzzle,
+    get_puzzles,
+    get_completed_puzzles,
+    get_leaderboard,
+)
 from src.queries.submission import (
     create_submission,
     find_submissions_by_discord_id_and_puzzle_id,
@@ -86,10 +91,15 @@ class Puzzle(commands.GroupCog):
         puzzle_id = puzzle_id.upper()
         puzzle = await get_puzzle(puzzle_id)
         player = await get_player(interaction.user.id)
-        if not puzzle or not await can_access_puzzle(puzzle, player.team_name):
-            return await interaction.followup.send(
-                "No puzzle with the corresponding ID exists!"
-            )
+        """
+        the check below has been commented out because the hunt has ended
+        but some people still want to use the bot to solve puzzles.
+        uncomment it if using this for another hunt
+        """
+        # if not puzzle or not await can_access_puzzle(puzzle, player.team_name):
+        #     return await interaction.followup.send(
+        #         "No puzzle with the corresponding ID exists!"
+        #     )
         submissions = await find_submissions_by_discord_id_and_puzzle_id(
             player.discord_id, puzzle_id
         )
@@ -201,7 +211,8 @@ class Puzzle(commands.GroupCog):
             )
 
         player = await get_player(interaction.user.id)
-        puzzles = await get_accessible_puzzles(player.team_name)
+        # puzzles = await get_accessible_puzzles(player.team_name)
+        puzzles = await get_puzzles()
         embed = discord.Embed(title="Current Puzzles", color=discord.Color.greyple())
 
         puzzle_ids = []
